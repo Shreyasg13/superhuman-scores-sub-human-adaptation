@@ -1,0 +1,29 @@
+id,claim,value_used,evidence_status,source,source_url,checked,note
+IQ1,Top Mensa Norway (public) score,151 (Claude Fable 5.1; GPT-6 Astra vision),Verified in article citing tracker,36Kr / KuCoin reporting TrackingAI,https://eu.36kr.com/en/p/4002779288277120,2026-09-29,151 = all 35 correct = the test's maximum; true ability above 151 cannot be measured
+IQ2,Mensa Norway 145 cluster,145 (GPT-5.6 Sol; Gemini 3.1 Pro),Verified in article citing tracker,KuCoin reporting TrackingAI,https://www.kucoin.com/news/flash/ai-achieves-151-on-mensa-norway-iq-test-surpassing-99-97-of-humans,2026-09-29,
+IQ3,Top offline-test score,135 (GPT-5.6 Terra vision),Verified in article citing tracker,36Kr / KuCoin,https://eu.36kr.com/en/p/4002779288277120,2026-09-29,Offline test has 16 questions; maximum about 136
+IQ4,Offline score Fable 5.1 and GPT-6 Astra,130 and 130,Verified in article citing tracker,KuCoin,https://www.kucoin.com/news/flash/ai-achieves-151-on-mensa-norway-iq-test-surpassing-99-97-of-humans,2026-09-29,Astra was previously estimated at 133; corrected to measured 130
+IQ5,Offline Claude Opus 5 / Opus 5 MAX / Sol Ultra / Sol Ultra vision,129 / 127 / 130 / 131,Search snippet only,BinaryVerse AI (site blocks automated reading),https://binaryverseai.com/ai-iq-test-2025/,2026-09-27,Primary tracker page renders by script; open trackingai.org/IQ to confirm
+IQ6,Grok-4.20 Expert Mensa score,145 (April 2026),Search snippet,Visual Capitalist,https://www.visualcapitalist.com/ranked-the-smartest-ai-models-in-2026/,2026-09-27,
+IQ7,Early top AI IQ history,about 101 (early 2024); passed 120 (o1; Sep 2024); 135 (o3; 2025),Verified in article (101 and 120); snippet (135),KuCoin; Voronoi,https://www.kucoin.com/news/flash/ai-achieves-151-on-mensa-norway-iq-test-surpassing-99-97-of-humans,2026-09-29,Article: best early-2024 model barely above human average
+A1,ARC-AGI-1 best,98.5%,Verified on primary,ARC Prize results,https://arcprize.org/results,2026-09-29,
+A2,ARC-AGI-2 GPT-6 Astra,95.0%,Verified on primary,ARC Prize results,https://arcprize.org/results,2026-09-29,
+A3,ARC-AGI-2 GPT-5.6 Sol,92.5%,Verified on primary,ARC Prize results,https://arcprize.org/results,2026-09-29,
+A4,ARC-AGI-2 Claude Opus 5.5,93.3%,Verified on primary,ARC Prize results,https://arcprize.org/results,2026-09-29,Corrected from 91.7% (aggregator BenchLM)
+A5,ARC-AGI-2 others,Opus 5 90.4%; Fable 5.1 90.0%; Gemini 3.8 Flash 89.2%; Gemini 3.7 Flash 84.6%; Grok 4.6 67.1%,Verified on primary,ARC Prize results,https://arcprize.org/results,2026-09-29,
+A6,ARC-AGI-2 average human,66%,Aggregator,BenchLM,https://benchlm.ai/benchmarks/arc-agi-2,2026-09-27,Human panel 100%: every task solved by at least two people (ARC-AGI-2 paper)
+A7,ARC-AGI-1 human reference,64% average; 98% panel,From memory - not verified,Author recall of prior ARC studies,,,Treat as approximate or remove
+A8,ARC-AGI-3 standard harness,GPT-6 Astra 62.7; Opus 5 30.2; Gemini 3.8 Flash 10.4; GPT-5.6 Sol 7.8; Grok 4.6 2.1,Aggregator citing ARC Prize data (read 2026-09-25),LLMLearner,https://llmlearner.com/rankings/arc-agi-3,2026-09-29,Opus 5 30.16%; Sol 7.78%; Grok 4.6 2.11% also verified on ARC Prize results
+A9,ARC-AGI-3 headline row (best harness),GPT-6 99.95%; Gemini 3.8 Flash 35.00%,Verified on primary,ARC Prize results,https://arcprize.org/results,2026-09-29,Includes provider-adapter harness; not comparable with standard harness; page uses standard
+A10,ARC-AGI-3 at launch,all frontier models below 1% (Gemini 3.1 Pro 0.37%),Primary paper + news,ARC-AGI-3 paper,https://arxiv.org/abs/2603.24621,2026-09-27,Humans solved 100% of environments
+H1,HLE top scores,Opus 5.5 61.4%; Fable 5.1 59.1%,Verified on primary,Artificial Analysis,https://artificialanalysis.ai/evaluations/humanitys-last-exam,2026-09-29,
+H2,HLE Fable 5 / Opus 5,55.5% / 54.9%,Aggregator,pricepertoken / modelgrep,https://pricepertoken.com/leaderboards/benchmark/hle,2026-09-27,
+X1,AA Intelligence Index v4.3,Opus 5.5 58; Fable 5.1 53; GPT-6 Astra 52.7,Search snippet (AA leaderboard + modelgrep),Artificial Analysis; modelgrep,https://artificialanalysis.ai/leaderboards/models,2026-09-27,Index versions differ; only v4.3 values are comparable
+M1,METR 50% horizon history,GPT-4 4 min ... Opus 4.5 5 h 20 m; Opus 4.6 11 h 59 m; Mythos Preview at least 16 h,Verified (Wikipedia table citing METR),Wikipedia METR,https://en.wikipedia.org/wiki/METR,2026-09-29,METR page confirms the 16 h reliability limit
+M2,METR 80% horizon best,3 h 6 m (Mythos Preview),Verified (Wikipedia table citing METR),Wikipedia METR,https://en.wikipedia.org/wiki/METR,2026-09-29,
+M3,Doubling time,131 days (TH1.1; post-2023),Verified on primary,METR blog,https://metr.org/blog/2026-1-29-time-horizon-1-1/,2026-09-27,
+F1,Flynn effect,about 3 IQ points per decade,Peer-reviewed,Flynn (1987),https://doi.org/10.1037/0033-2909.101.2.171,,
+C1,1 in 2970 people at IQ 151,computed,Calculation,Normal(100;15) tail,,,Lower bound because 151 is the test ceiling
+E1,Nine-dimension profile scores,see paper Table 2,Author estimate,Anchored to rows above where possible,,,Not a published benchmark
+E2,Human-master model parameters,H50=2000 h; k=0.5; beta=1.5,Author assumption,,,,
+E3,Offline IQ estimates (Grok 4.6; Gemini 3.1 Pro),Mensa minus 18,Author estimate,Mean public-offline gap,,,

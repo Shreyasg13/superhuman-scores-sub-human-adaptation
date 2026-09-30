@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+code/fig/
+code/*.npy
+code/mc.json
+results_*.txt
+.DS_Store

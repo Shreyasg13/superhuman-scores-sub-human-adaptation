@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Superhuman Scores, Sub-Human Adaptation: A Multi-Dimensional, Growth-Aware Comparison of Frontier AI Models and Human Intelligence"
+authors:
+  - family-names: Gondane
+    given-names: Shreyash
+    affiliation: Independent Researcher
+type: software
+version: "1.0.0"
+date-released: "2026-09-29"
+license: MIT
+repository-code: "https://github.com/Shreyasg13/superhuman-scores-sub-human-adaptation"
+keywords: [artificial intelligence, psychometrics, ARC-AGI, time horizon, Monte Carlo, AGI measurement]

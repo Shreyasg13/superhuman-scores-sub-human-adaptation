@@ -1,0 +1,952 @@
+<title>Machine vs Human Minds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#fcfcfb; --line:#e3e5e9; --grid:#eceef1;
+  --ink:#0b0b0b; --ink-2:#52514e; --ink-3:#7c7b77;
+  --ai:#2a78d6; --ai-soft:#86b6ef; --ai-deep:#1c5cab;
+  --hum:#eb6834; --exp:#1baf7a;
+  --chip:#eef3fb;
+  --warn:#b25e00;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#121211; --surface:#1a1a19; --line:#2c2c2a; --grid:#262624;
+    --ink:#ffffff; --ink-2:#c3c2b7; --ink-3:#8f8e86;
+    --ai:#3987e5; --ai-soft:#6da7ec; --ai-deep:#256abf;
+    --hum:#d95926; --exp:#199e70; --chip:#1e2633; --warn:#e5a04a;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121211; --surface:#1a1a19; --line:#2c2c2a; --grid:#262624;
+  --ink:#ffffff; --ink-2:#c3c2b7; --ink-3:#8f8e86;
+  --ai:#3987e5; --ai-soft:#6da7ec; --ai-deep:#256abf;
+  --hum:#d95926; --exp:#199e70; --chip:#1e2633; --warn:#e5a04a;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 "IBM Plex Sans",system-ui,sans-serif;padding-inline:16px;padding-block:28px 64px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;gap:28px}
+h1,h2{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.05;font-weight:700}
+h2{font-size:22px;font-weight:700}
+p{margin:0}
+.lede{max-width:68ch;color:var(--ink-2);font-size:16px}
+.eyebrow{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.mono{font-family:"IBM Plex Mono",monospace}
+header{display:grid;gap:12px;padding-top:8px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:4px}
+.kpi b{font:600 28px/1.1 "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.kpi span{color:var(--ink-2);font-size:13px}
+section{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:14px}
+.sec-head{display:grid;gap:6px}
+.sec-head p{color:var(--ink-2);max-width:72ch}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.chart{position:relative;height:340px;width:100%}
+.chart.tall{height:420px}
+.chart.short{height:260px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--ink-2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.note{font-size:12.5px;color:var(--ink-3);max-width:80ch}
+.callout{border-left:3px solid var(--ai);padding:6px 12px;color:var(--ink-2);font-size:14px;max-width:80ch}
+.callout.warn{border-color:var(--warn)}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.presets button{font:500 13px "IBM Plex Sans",sans-serif;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px;border-radius:999px;cursor:pointer}
+.presets button[aria-pressed="true"]{background:var(--chip);border-color:var(--ai);color:var(--ink)}
+.presets button:focus-visible,input[type=range]:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+.sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px 22px}
+.sl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;font-size:13px}
+.sl label{color:var(--ink-2)}
+.sl output{font:500 12px "IBM Plex Mono",monospace;color:var(--ink);font-variant-numeric:tabular-nums}
+.sl input{grid-column:1/-1;width:100%;accent-color:var(--ai)}
+.verdict{font-size:15px}
+.verdict b{font-family:"IBM Plex Mono",monospace}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13.5px}
+th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font:500 11px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+td.m{font-family:"IBM Plex Mono",monospace}
+td.na{color:var(--ink-3)}
+tr.human td{background:color-mix(in srgb,var(--hum) 8%,transparent)}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.dim{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--ink-2);display:grid;gap:4px}
+.dim strong{color:var(--ink);font-weight:600}
+.src{font-size:13px;color:var(--ink-2);display:grid;gap:4px}
+.src a{color:var(--ai)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.part{display:grid;gap:8px;padding:18px 4px 0}
+.part h2{font-size:clamp(24px,3.4vw,32px)}
+.plot{width:100%;height:520px}
+.plot.mid{height:460px}
+.ctrl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;font-size:13px;color:var(--ink-2)}
+.ctrl label{display:flex;gap:10px;align-items:center}
+.ctrl input[type=range]{width:220px;max-width:60vw;accent-color:var(--ai)}
+.ctrl output{font:500 12.5px "IBM Plex Mono",monospace;color:var(--ink);min-width:9ch}
+.eqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.eq{border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:12px 14px;display:grid;gap:8px;overflow-x:auto}
+.eq .eyebrow{font-size:10.5px}
+.eq p{font-size:13px;color:var(--ink-2)}
+math{font-size:1.18em;color:var(--ink)}
+.live{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.live .kpi b{font-size:24px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--exp);margin-right:6px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.mini{width:100%;border-collapse:collapse;font-size:13px;min-width:0}
+.mini th,.mini td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.mini th:first-child,.mini td:first-child{text-align:left}
+.stage{position:relative;width:100%;height:560px;border-radius:10px;overflow:hidden;touch-action:pan-y;cursor:grab;background:radial-gradient(120% 90% at 50% 20%,var(--surface),var(--bg))}
+.stage:active{cursor:grabbing}
+.stage canvas{display:block;width:100%!important;height:100%!important}
+.stage .hint{position:absolute;left:12px;bottom:10px;font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3);pointer-events:none}
+.stage .fail{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-2);font-size:14px;padding:20px;text-align:center}
+.play{font:500 13px "IBM Plex Sans",sans-serif;border:1px solid var(--ai);background:var(--chip);color:var(--ink);padding:7px 14px;border-radius:999px;cursor:pointer}
+.play:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+.densWrap{position:relative;width:100%;height:580px}
+.densWrap canvas{display:block;width:100%;height:100%}
+.tipbox{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 9px;font-size:12px;color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.12);max-width:240px}
+@media (max-width:600px){.stage{height:420px}.densWrap{height:460px}}
+.papers{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.paper{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:6px;align-content:start;background:var(--surface)}
+.paper[hidden]{display:none!important}
+.ptop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tier{font:500 10.5px "IBM Plex Mono",monospace;letter-spacing:.04em;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2)}
+.t-l{background:color-mix(in srgb,var(--ai) 22%,transparent);border-color:var(--ai);color:var(--ink)}
+.t-h{background:color-mix(in srgb,var(--ai) 10%,transparent);color:var(--ink)}
+.t-r{border-style:dashed}
+.yr{font-size:12px;color:var(--ink-3)}
+.ptitle{font-weight:600;color:var(--ink);text-decoration:none;line-height:1.35}
+.ptitle:hover,.ptitle:focus-visible{color:var(--ai);text-decoration:underline}
+.pauth{font-size:12.5px;color:var(--ink-2)}
+.paper p{font-size:13px;color:var(--ink-2)}
+.pused{font-size:11px;color:var(--ink-3)}
+.evt td{text-align:left;vertical-align:top;font-size:12.5px}
+.evt td.note{color:var(--ink-2);min-width:180px}
+.evt td.m{white-space:normal;min-width:150px}
+.ev{display:inline-block;font:500 10.5px "IBM Plex Mono",monospace;padding:2px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.ev-ok{background:color-mix(in srgb,var(--exp) 22%,transparent);border-color:var(--exp)}
+.ev-ok2{background:color-mix(in srgb,var(--exp) 10%,transparent)}
+.ev-agg{background:color-mix(in srgb,var(--ai) 10%,transparent)}
+.ev-snip,.ev-mem{background:color-mix(in srgb,var(--hum) 14%,transparent);border-color:var(--hum)}
+.ev-est,.ev-calc{border-style:dashed}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Snapshot · 27 Sep 2026 · public leaderboards</div>
+  <h1>Machine vs Human Minds</h1>
+  <p class="lede">How the top ~10 frontier models compare with people on IQ-style tests, on newer adaptability benchmarks, and on how fast each side improves. The short version: models now beat almost every human on static reasoning tests, still trail an ordinary person at learning from experience, and are improving on a timescale of months while human cognition is flat.</p>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><div class="eyebrow">Top AI · Mensa Norway</div><b id="k1">151</b><span>Claude Fable 5.1 and GPT-6 Astra (Vision): all 35 questions right, the test's maximum. At least 1 in <span id="k1r">3,000</span> humans.</span></div>
+  <div class="kpi"><div class="eyebrow">Top AI · leak-proof offline test</div><b>135</b><span>GPT-5.6 Terra Ultra. Roughly the top 1% of humans. Scores drop 15–21 pts off the public test.</span></div>
+  <div class="kpi"><div class="eyebrow">ARC-AGI-3 · learning new games</div><b>62.7%</b><span>GPT-6 Astra vs a human baseline of 100%. Was under 1% for every model in March 2026.</span></div>
+  <div class="kpi"><div class="eyebrow">METR task horizon doubling</div><b>~131 days</b><span>Length of expert task AI finishes half the time. Human capacity: roughly constant.</span></div>
+</div>
+
+<!-- 1. Bell curve -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">1 · Where the models sit on the human curve</div>
+    <h2>IQ distribution (mean 100, SD 15) with AI scores marked</h2>
+    <p>The public Mensa Norway test is in training data, so treat it as a ceiling. The offline test was written by a Mensa member and never posted online, so it is the fairer comparison.</p>
+  </div>
+  <div class="chart"><canvas id="bell" aria-label="Human IQ bell curve with AI score markers" role="img"></canvas></div>
+  <div class="legend">
+    <span><i style="background:var(--hum)"></i>Human population</span>
+    <span><i style="background:var(--ai)"></i>Top AI, public test (151 = test maximum)</span>
+    <span><i style="background:var(--ai-deep)"></i>Top AI, offline test (135)</span>
+  </div>
+</section>
+
+<!-- 2. Top-10 IQ -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">2 · Top 10 models on IQ tests</div>
+    <h2>Public vs offline IQ, TrackingAI</h2>
+    <p>Where a model has both scores, the gap shows how much of the public number is memorisation. Claude Fable 5.1 drops 21 points; GPT-5.6 Sol Ultra (Vision) drops only 2.</p>
+  </div>
+  <div class="chart tall"><canvas id="iq" aria-label="Grouped bar chart of AI IQ scores" role="img"></canvas></div>
+  <div class="legend">
+    <span><i style="background:var(--ai-soft)"></i>Mensa Norway (public)</span>
+    <span><i style="background:var(--ai-deep)"></i>Offline (never online)</span>
+    <span><i style="background:var(--hum)"></i>Human mean 100 / Mensa cut-off 130</span>
+  </div>
+  <p class="note">Grok-4.20 Expert is the April 2026 reading; all others are the September 2026 snapshot. Blank bar = not tested on that variant.</p>
+</section>
+
+<!-- 3. Benchmarks vs humans -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">3 · Depth vs adaptability</div>
+    <h2>Same puzzle family, three generations: the gap reopens when the task demands learning</h2>
+    <p>ARC-AGI-1 and 2 are static grid puzzles, and models have passed the average person. ARC-AGI-3 drops an agent into an unfamiliar game with no instructions and scores how efficiently it learns the rules against human action counts.</p>
+  </div>
+  <div class="two">
+    <div class="chart"><canvas id="arc" aria-label="ARC-AGI benchmarks: best AI vs humans" role="img"></canvas></div>
+    <div class="chart"><canvas id="arc3" aria-label="ARC-AGI-3 top score over 2026" role="img"></canvas></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--ai)"></i>Best AI</span>
+    <span><i style="background:var(--hum)"></i>Average individual human</span>
+    <span><i style="background:var(--exp)"></i>Human panel / baseline</span>
+  </div>
+  <p class="callout warn">GPT-6 Astra's 62.7% on ARC-AGI-3 is the official standard-harness score. A 99.9% figure also circulates; it used OpenAI's own agent harness and is not comparable.</p>
+</section>
+
+<!-- 4. Profile radar -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">4 · Cognitive profile</div>
+    <h2>Different shapes of intelligence, not one number</h2>
+    <p>Nine dimensions scored 0–100, anchored to benchmarks where one exists. The frontier-AI profile is "jagged": superhuman on knowledge, speed and static reasoning, weak on continual learning, sample efficiency and embodiment.</p>
+  </div>
+  <div class="two">
+    <div class="chart tall"><canvas id="radar" aria-label="Radar chart of cognitive profiles" role="img"></canvas></div>
+    <div class="dims" id="dims"></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--ai)"></i>Frontier AI (best of top 10)</span>
+    <span><i style="background:var(--hum)"></i>Average adult</span>
+    <span><i style="background:var(--exp)"></i>Top human expert (in their field)</span>
+  </div>
+  <p class="note">Profile scores are an editorial index, not a published benchmark. Anchors are listed per dimension; where no benchmark exists (continual learning, embodiment) the score is a judgment call.</p>
+</section>
+
+<!-- 5. Weighting -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">5 · Change the weights, change the winner</div>
+    <h2>Weighted composite intelligence</h2>
+    <p>Who is "smarter" depends on what you count. Pick a definition or drag the weights.</p>
+  </div>
+  <div class="presets" id="presets"></div>
+  <div class="two">
+    <div class="chart short"><canvas id="comp" aria-label="Weighted composite score bars" role="img"></canvas></div>
+    <div style="display:grid;gap:12px;align-content:start">
+      <p class="verdict" id="verdict"></p>
+      <p class="note" id="presetNote"></p>
+    </div>
+  </div>
+  <div class="sliders" id="sliders"></div>
+</section>
+
+<!-- 6. Velocity -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">6 · Growth velocity</div>
+    <h2>AI moves in months; human cognition moves in decades</h2>
+    <p>Left: best public-test IQ over time. It rose about 50 points in 30 months. The Flynn effect, the fastest measured change in human IQ, is about 3 points per decade. Right: METR's time horizon, the length of expert software task an agent completes half the time (log scale).</p>
+  </div>
+  <div class="two">
+    <div class="chart"><canvas id="iqtime" aria-label="Top AI IQ over time" role="img"></canvas></div>
+    <div class="chart"><canvas id="metr" aria-label="METR time horizon, log scale" role="img"></canvas></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--ai)"></i>Top AI</span>
+    <span><i style="background:var(--ai-deep)"></i>Top AI, offline test</span>
+    <span><i style="background:var(--hum)"></i>Human reference</span>
+  </div>
+  <p class="callout">METR says its suite cannot measure reliably above about 16 hours, so Claude Mythos Preview's "≥16 h" is a floor. At 80% reliability the best horizon is about 3 hours: models attempt long tasks well before they finish them dependably.</p>
+</section>
+
+<div class="part">
+  <div class="eyebrow">Part II · The model behind the comparison</div>
+  <h2>3D landscapes, population maps and the equations that link them</h2>
+  <p class="lede">Every chart below is computed in your browser from the equations in section 10. Parameters are calibrated to the published numbers above; where a step is an assumption, the chart says so.</p>
+</div>
+
+<!-- 7. 3D success landscape -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">7 · Success landscape (3D)</div>
+    <h2>Where a human master still wins: novel, long tasks</h2>
+    <p>Height is the probability of finishing a task. One axis is how new the task is (0 = well-practised, 1 = never seen, like ARC-AGI-3). The other is how long it takes a human expert, from one minute to one year. Blue is the frontier AI; green is a human master in their own field. Drag to rotate.</p>
+  </div>
+  <div class="ctrl">
+    <label for="tDate">AI capability date <input type="range" id="tDate" min="-6" max="24" step="1" value="0"></label>
+    <output id="tDateOut" for="tDate"></output>
+    <button type="button" class="play" id="playLand">▶ Run simulation 2026 → 2028</button>
+    <span id="gapOut" class="mono"></span>
+  </div>
+  <div id="land" class="stage" role="img" aria-label="Animated 3D surfaces of task success probability for AI and a human master"><span class="hint">Drag to rotate · auto-orbits when idle</span></div>
+  <p class="note">Model: P = σ(k·log₂(H₅₀/h) − β(n − 0.2)). AI: H₅₀ = 16 h in May 2026 doubling every 131 days, k = 0.574 (fits METR's 16 h at 50% and 3 h at 80%), β = 6.0 (fits ~30% on 8-minute novel tasks, the median of the ARC-AGI-3 leaders). Master: H₅₀ = 2,000 h, k = 0.5, β = 1.5 (assumed). Moving the date only grows H₅₀; if novelty handling also improves, the blue surface rises faster on the right.</p>
+</section>
+
+<!-- 8. Density map -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">8 · Population map</div>
+    <h2>20,000 simulated people vs the models: static IQ against adaptive learning</h2>
+    <p>Each hexagon counts simulated people, drawn from a bivariate normal with correlation 0.6 between the two abilities, with marginal histograms on each axis. Models sit far right on static reasoning but low on learning new tasks, a corner of the map almost no human occupies.</p>
+  </div>
+  <div class="densWrap"><canvas id="dens" role="img" aria-label="Hexagonal density map of human population with AI model positions"></canvas><div class="tipbox" id="densTip" hidden></div></div>
+  <div class="legend">
+    <span><i style="background:var(--hum)"></i>Human population density</span>
+    <span><i style="background:var(--ai)"></i>AI, measured (filled) · estimated (hollow)</span>
+    <span><i style="background:var(--exp)"></i>Human master (top 0.1%, z = 3)</span>
+  </div>
+  <p class="note">x = (offline IQ − 100) / 15. y = Φ⁻¹(½ · ARC-AGI-3 score), which assumes the 100% human baseline sits at the human median. Hollow markers estimate offline IQ as public Mensa score minus 18, the average public-to-offline gap measured for models with both.</p>
+</section>
+
+<!-- 9. 3D capability space -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">9 · Capability space (3D)</div>
+    <h2>Humans form a cloud; AI moves along one axis</h2>
+    <p>The nine profile dimensions from section 4 collapsed into three: Knowledge &amp; reasoning (dims 1–3), Adaptability (4, 6, 7) and Agency &amp; grounding (5, 9). Each grey-orange point is a simulated person. The blue path is the frontier AI from 2023 to today.</p>
+  </div>
+  <div id="space" class="stage" role="img" aria-label="Animated 3D point cloud of the human population with the AI trajectory"><span class="hint">Drag to rotate · the bright dot replays the AI path</span></div>
+  <p class="note">The AI path before September 2026 is an editorial reconstruction, scaled to ARC-AGI-3 and METR progress; it is not a measured series.</p>
+</section>
+
+<!-- 10. Equations -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">10 · Equations</div>
+    <h2>The maths, and a live adaptability-adjusted IQ</h2>
+    <p>Five relations drive this page. The last two show why weighting matters: an arithmetic mean lets a superpower cover a weakness; a geometric mean treats the weakest ability as a bottleneck, which is closer to how general intelligence behaves in real work.</p>
+  </div>
+  <div class="eqs">
+    <div class="eq"><div class="eyebrow">Task success</div>
+      <math display="block"><mi>P</mi><mo>(</mo><mi>n</mi><mo>,</mo><mi>h</mi><mo>)</mo><mo>=</mo><mi>σ</mi><mrow><mo>(</mo><mi>k</mi><mo>·</mo><msub><mi>log</mi><mn>2</mn></msub><mfrac><msub><mi>H</mi><mn>50</mn></msub><mi>h</mi></mfrac><mo>−</mo><mi>β</mi><mo>(</mo><mi>n</mi><mo>−</mo><msub><mi>n</mi><mn>0</mn></msub><mo>)</mo><mo>)</mo></mrow></math>
+      <p>Logistic in log-time, as METR fits it, plus a penalty for novelty n.</p></div>
+    <div class="eq"><div class="eyebrow">Horizon growth</div>
+      <math display="block"><msub><mi>H</mi><mn>50</mn></msub><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><msub><mi>H</mi><mn>0</mn></msub><mo>·</mo><msup><mn>2</mn><mrow><mo>(</mo><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub><mo>)</mo><mo>/</mo><msub><mi>T</mi><mi>d</mi></msub></mrow></msup></math>
+      <p>H₀ = 16 h (May 2026), T<sub>d</sub> ≈ 131 days (METR TH1.1, 2023 onward).</p></div>
+    <div class="eq"><div class="eyebrow">Placing AI on the human scale</div>
+      <math display="block"><msub><mi>z</mi><mi>s</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>IQ</mi><mtext>off</mtext></msub><mo>−</mo><mn>100</mn></mrow><mn>15</mn></mfrac><mo>,</mo><mspace width="1em"/><msub><mi>z</mi><mi>a</mi></msub><mo>=</mo><msup><mi>Φ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msub><mi>S</mi><mtext>ARC3</mtext></msub><mo>)</mo></mrow></math>
+      <p>Static and adaptive z-scores; 0 = average person, 3 = one in 740.</p></div>
+    <div class="eq"><div class="eyebrow">Arithmetic vs bottleneck composite</div>
+      <math display="block"><msub><mi>I</mi><mi>A</mi></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><msub><mi>w</mi><mi>i</mi></msub><msub><mi>s</mi><mi>i</mi></msub></mrow><mrow><mo>∑</mo><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac><mo>,</mo><mspace width="1em"/><msub><mi>I</mi><mi>G</mi></msub><mo>=</mo><munder><mo>∏</mo><mi>i</mi></munder><msubsup><mi>s</mi><mi>i</mi><mrow><msub><mi>w</mi><mi>i</mi></msub><mo>/</mo><mo>∑</mo><mi>w</mi></mrow></msubsup></math>
+      <p>Uses the weights you set in section 5.</p></div>
+    <div class="eq"><div class="eyebrow">Adaptability-adjusted IQ</div>
+      <math display="block"><msup><mi>IQ</mi><mo>*</mo></msup><mo>=</mo><mn>100</mn><mo>+</mo><mn>15</mn><mo>[</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo>)</mo><msub><mi>z</mi><mi>s</mi></msub><mo>+</mo><mi>λ</mi><msub><mi>z</mi><mi>a</mi></msub><mo>]</mo></math>
+      <p>λ is the share of weight you put on learning new tasks.</p></div>
+  </div>
+  <div class="two">
+    <div style="display:grid;gap:10px;align-content:start">
+      <div class="ctrl"><label for="lam">Weight on adaptability λ <input type="range" id="lam" min="0" max="1" step="0.05" value="0.5"></label><output id="lamOut" for="lam"></output></div>
+      <div class="chart short"><canvas id="iqstar" role="img" aria-label="Adaptability-adjusted IQ bars"></canvas></div>
+    </div>
+    <div style="display:grid;gap:10px;align-content:start">
+      <div class="eyebrow">Composite with your section-5 weights</div>
+      <table class="mini" id="compTbl"></table>
+      <p class="note">When a profile has one very weak dimension, I<sub>G</sub> falls well below I<sub>A</sub>. Frontier AI loses the most, because continual learning and embodiment score low.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 11. Live projection -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">11 · Live projection</div>
+    <h2><span class="dot"></span>AI task horizon, extrapolated to this second</h2>
+    <p>The counters tick in real time from the growth equation. They are an extrapolation of the last measured point, not a live measurement. The chart shows the projection with a band for doubling times of 100–200 days, against human work lengths.</p>
+  </div>
+  <div class="live">
+    <div class="kpi"><div class="eyebrow">Extrapolated 50% horizon now</div><b id="liveH">–</b><span>From 16 h on 8 May 2026 (a floor).</span></div>
+    <div class="kpi"><div class="eyebrow">Reaches 1 work-week (40 h)</div><b id="d40">–</b><span id="d40r"></span></div>
+    <div class="kpi"><div class="eyebrow">Reaches 1 work-month (167 h)</div><b id="d167">–</b><span id="d167r"></span></div>
+    <div class="kpi"><div class="eyebrow">Reaches a master's year-long project (2,000 h)</div><b id="d2000">–</b><span id="d2000r"></span></div>
+  </div>
+  <div class="chart tall"><canvas id="proj" role="img" aria-label="Projection of AI time horizon with uncertainty band"></canvas></div>
+  <p class="callout warn">METR notes its task suite cannot measure reliably above about 16 hours, and trends like this bend. Treat dates as "if the 2023–26 trend holds", and remember the 80% horizon is about five times shorter.</p>
+</section>
+
+
+<!-- 12. Table -->
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">12 · Leaderboard</div>
+    <h2>Top frontier models across benchmarks</h2>
+    <p>Dashes mean no published score on that test. Human rows give the reference point where one exists.</p>
+  </div>
+  <div class="tbl"><table id="tbl"></table></div>
+  <p class="note">HLE = Humanity's Last Exam (Artificial Analysis run). AA Index = Artificial Analysis Intelligence Index v4.3 (ceiling 58 as of 22 Sep). Gemini 3.1 Pro's ARC figures are Feb and Mar 2026.</p>
+</section>
+
+<section id="research">
+  <div class="sec-head">
+    <div class="eyebrow">13 · Research foundations</div>
+    <h2>The peer-reviewed and most-cited work behind this page</h2>
+    <p>Every assumption above traces to one of these. They run from a century of human psychometrics to the 2025–26 benchmark papers that supply the AI numbers.</p>
+  </div>
+  <div class="presets" id="pfilter"><button type="button" data-f="all" aria-pressed="true">All (26)</button><button type="button" data-f="human" aria-pressed="false">Human intelligence (6)</button><button type="button" data-f="machine" aria-pressed="false">Measuring machine intelligence (7)</button><button type="button" data-f="scaling" aria-pressed="false">Scaling & growth (5)</button><button type="button" data-f="bench" aria-pressed="false">Benchmarks used here (5)</button><button type="button" data-f="compare" aria-pressed="false">Human vs AI studies (3)</button></div>
+  <div class="papers" id="papers"><article class="paper" data-g="human"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">1904</span></div><a class="ptitle" href="https://doi.org/10.2307/1412107">“General Intelligence,” objectively determined and measured</a><div class="pauth">Spearman, C. · <i>American Journal of Psychology</i></div><p>Found that scores on different mental tests correlate (the positive manifold) and proposed a general factor, g.</p><div class="pused mono">Used in §8 population correlation of 0.6</div></article><article class="paper" data-g="human"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">1963</span></div><a class="ptitle" href="https://doi.org/10.1037/h0046743">Theory of fluid and crystallized intelligence: a critical experiment</a><div class="pauth">Cattell, R. B. · <i>Journal of Educational Psychology</i></div><p>Split intelligence into fluid (solving new problems) and crystallized (accumulated knowledge).</p><div class="pused mono">Used in §4 profile axes; §8 static vs adaptive</div></article><article class="paper" data-g="human"><div class="ptop"><span class="tier t-l">Landmark · 10k+</span><span class="mono yr">1993</span></div><a class="ptitle" href="https://doi.org/10.1017/CBO9780511571312">Human Cognitive Abilities: A Survey of Factor-Analytic Studies</a><div class="pauth">Carroll, J. B. · <i>Cambridge University Press</i></div><p>Reanalysed 460+ datasets into a three-stratum model, the basis of today&#x27;s Cattell–Horn–Carroll (CHC) theory.</p><div class="pused mono">Used in §4 nine dimensions; §9 grouping</div></article><article class="paper" data-g="human"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">1987</span></div><a class="ptitle" href="https://doi.org/10.1037/0033-2909.101.2.171">Massive IQ gains in 14 nations: what IQ tests really measure</a><div class="pauth">Flynn, J. R. · <i>Psychological Bulletin</i></div><p>Documented population IQ gains of roughly 3 points per decade, the fastest measured change in human scores.</p><div class="pused mono">Used in §6 human growth reference</div></article><article class="paper" data-g="human"><div class="ptop"><span class="tier t-l">Landmark · 10k+</span><span class="mono yr">1993</span></div><a class="ptitle" href="https://doi.org/10.1037/0033-295X.100.3.363">The role of deliberate practice in the acquisition of expert performance</a><div class="pauth">Ericsson, K. A., Krampe, R. T. &amp; Tesch-Römer, C. · <i>Psychological Review</i></div><p>Expert performance comes from about a decade of deliberate practice; defines what a human master is.</p><div class="pused mono">Used in §7 master parameters; §8 master zone</div></article><article class="paper" data-g="human"><div class="ptop"><span class="tier t-l">Landmark · 10k+</span><span class="mono yr">1998</span></div><a class="ptitle" href="https://doi.org/10.1037/0033-2909.124.2.262">The validity and utility of selection methods in personnel psychology</a><div class="pauth">Schmidt, F. L. &amp; Hunter, J. E. · <i>Psychological Bulletin</i></div><p>85 years of data: general mental ability is the strongest single predictor of job performance, but far from the only one.</p><div class="pused mono">Used in §5 economic-work weights</div></article><article class="paper" data-g="machine"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">2007</span></div><a class="ptitle" href="https://doi.org/10.1007/s11023-007-9079-x">Universal intelligence: a definition of machine intelligence</a><div class="pauth">Legg, S. &amp; Hutter, M. · <i>Minds and Machines</i></div><p>Defines intelligence as performance weighted across all environments, a formal version of a weighted composite.</p><div class="pused mono">Used in §5 and §10 weighted indices</div></article><article class="paper" data-g="machine"><div class="ptop"><span class="tier t-e">Established · 100–1k</span><span class="mono yr">2017</span></div><a class="ptitle" href="https://doi.org/10.1017/9781316594179">The Measure of All Minds</a><div class="pauth">Hernández-Orallo, J. · <i>Cambridge University Press</i></div><p>Shows why human IQ tests transfer poorly to machines and argues for task-difficulty-based measurement.</p><div class="pused mono">Used in §1–2 contamination caveats</div></article><article class="paper" data-g="machine"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">2017</span></div><a class="ptitle" href="https://doi.org/10.1017/S0140525X16001837">Building machines that learn and think like people</a><div class="pauth">Lake, B. M., Ullman, T. D., Tenenbaum, J. B. &amp; Gershman, S. J. · <i>Behavioral and Brain Sciences</i></div><p>People learn new concepts from a few examples by building causal, compositional models; machines of the time did not.</p><div class="pused mono">Used in §4 sample efficiency</div></article><article class="paper" data-g="machine"><div class="ptop"><span class="tier t-l">Landmark · 10k+</span><span class="mono yr">2017</span></div><a class="ptitle" href="https://doi.org/10.1073/pnas.1611835114">Overcoming catastrophic forgetting in neural networks</a><div class="pauth">Kirkpatrick, J. et al. · <i>PNAS</i></div><p>Networks overwrite old skills when trained on new ones; the core obstacle to continual learning.</p><div class="pused mono">Used in §4 continual learning score</div></article><article class="paper" data-g="machine"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">2019</span></div><a class="ptitle" href="https://arxiv.org/abs/1911.01547">On the Measure of Intelligence</a><div class="pauth">Chollet, F. · <i>arXiv</i></div><p>Intelligence as skill-acquisition efficiency, not skill; introduced ARC.</p><div class="pused mono">Used in §3 and §5 adaptability weights</div></article><article class="paper" data-g="machine"><div class="ptop"><span class="tier t-e">Established · 100–1k</span><span class="mono yr">2023</span></div><a class="ptitle" href="https://arxiv.org/abs/2311.02462">Levels of AGI for operationalizing progress on the path to AGI</a><div class="pauth">Morris, M. R. et al. · <i>ICML 2024 (position)</i></div><p>Rates systems on two axes, performance and generality, against percentiles of skilled adults.</p><div class="pused mono">Used in §4 expert vs average benchmarks</div></article><article class="paper" data-g="machine"><div class="ptop"><span class="tier t-r">Recent primary source</span><span class="mono yr">2025</span></div><a class="ptitle" href="https://arxiv.org/abs/2510.18212">A Definition of AGI</a><div class="pauth">Hendrycks, D., Song, D., Szegedy, C., Lee, H., Gal, Y. et al. · <i>arXiv</i></div><p>Scores AI on ten CHC domains at equal weight: GPT-4 27%, GPT-5 57%, with long-term memory storage the largest deficit.</p><div class="pused mono">Used in §4 jagged profile; §5 balanced preset</div></article><article class="paper" data-g="scaling"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">2020</span></div><a class="ptitle" href="https://arxiv.org/abs/2001.08361">Scaling laws for neural language models</a><div class="pauth">Kaplan, J. et al. · <i>arXiv</i></div><p>Loss falls as a power law in model size, data and compute.</p><div class="pused mono">Used in §6 growth velocity</div></article><article class="paper" data-g="scaling"><div class="ptop"><span class="tier t-l">Landmark · 10k+</span><span class="mono yr">2020</span></div><a class="ptitle" href="https://arxiv.org/abs/2005.14165">Language models are few-shot learners</a><div class="pauth">Brown, T. B. et al. · <i>NeurIPS</i></div><p>GPT-3: large models learn tasks from a few in-context examples without weight updates.</p><div class="pused mono">Used in §4 in-context learning vs memory</div></article><article class="paper" data-g="scaling"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">2022</span></div><a class="ptitle" href="https://arxiv.org/abs/2203.15556">Training compute-optimal large language models</a><div class="pauth">Hoffmann, J. et al. · <i>NeurIPS</i></div><p>Chinchilla: scale parameters and data together for a fixed compute budget.</p><div class="pused mono">Used in §6 growth velocity</div></article><article class="paper" data-g="scaling"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">2022</span></div><a class="ptitle" href="https://arxiv.org/abs/2206.07682">Emergent abilities of large language models</a><div class="pauth">Wei, J. et al. · <i>TMLR</i></div><p>Some abilities appear abruptly past a scale threshold.</p><div class="pused mono">Used in §3 ARC-AGI-3 jump</div></article><article class="paper" data-g="scaling"><div class="ptop"><span class="tier t-e">Established · 100–1k</span><span class="mono yr">2023</span></div><a class="ptitle" href="https://arxiv.org/abs/2304.15004">Are emergent abilities of large language models a mirage?</a><div class="pauth">Schaeffer, R., Miranda, B. &amp; Koyejo, S. · <i>NeurIPS (outstanding paper)</i></div><p>Apparent jumps often come from the choice of metric; smooth metrics show smooth progress.</p><div class="pused mono">Used in §5 why weighting and metric choice matter</div></article><article class="paper" data-g="bench"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">2021</span></div><a class="ptitle" href="https://arxiv.org/abs/2009.03300">Measuring massive multitask language understanding (MMLU)</a><div class="pauth">Hendrycks, D. et al. · <i>ICLR</i></div><p>The 57-subject knowledge benchmark that frontier models later saturated, prompting HLE.</p><div class="pused mono">Used in §12 knowledge lineage</div></article><article class="paper" data-g="bench"><div class="ptop"><span class="tier t-r">Recent primary source</span><span class="mono yr">2025</span></div><a class="ptitle" href="https://arxiv.org/abs/2501.14249">Humanity&#x27;s Last Exam</a><div class="pauth">Phan, L. et al. · <i>arXiv</i></div><p>2,500 expert-written questions built to resist saturation.</p><div class="pused mono">Used in §12 HLE column</div></article><article class="paper" data-g="bench"><div class="ptop"><span class="tier t-r">Recent primary source</span><span class="mono yr">2025</span></div><a class="ptitle" href="https://arxiv.org/abs/2505.11831">ARC-AGI-2: a new challenge for frontier AI reasoning systems</a><div class="pauth">Chollet, F. et al. · <i>arXiv</i></div><p>Harder static puzzles; average person 66%, human panel 100%.</p><div class="pused mono">Used in §3 ARC-AGI-2</div></article><article class="paper" data-g="bench"><div class="ptop"><span class="tier t-r">Recent primary source</span><span class="mono yr">2026</span></div><a class="ptitle" href="https://arxiv.org/abs/2603.24621">ARC-AGI-3: a new challenge for frontier agentic intelligence</a><div class="pauth">ARC Prize Foundation · <i>arXiv</i></div><p>Interactive games scored against human action efficiency; every model under 1% at launch.</p><div class="pused mono">Used in §3, §8 adaptive axis</div></article><article class="paper" data-g="bench"><div class="ptop"><span class="tier t-r">Recent primary source</span><span class="mono yr">2025</span></div><a class="ptitle" href="https://arxiv.org/abs/2503.14499">Measuring AI ability to complete long tasks</a><div class="pauth">Kwa, T. et al. (METR) · <i>arXiv</i></div><p>Defines the 50% time horizon and its exponential growth.</p><div class="pused mono">Used in §6, §7 success model, §11 projection</div></article><article class="paper" data-g="compare"><div class="ptop"><span class="tier t-e">Established · 100–1k</span><span class="mono yr">2023</span></div><a class="ptitle" href="https://doi.org/10.1038/s41562-023-01659-w">Emergent analogical reasoning in large language models</a><div class="pauth">Webb, T., Holyoak, K. J. &amp; Lu, H. · <i>Nature Human Behaviour</i></div><p>GPT-3 matched or beat people on Raven-style analogy problems zero-shot.</p><div class="pused mono">Used in §1–2 IQ-style results</div></article><article class="paper" data-g="compare"><div class="ptop"><span class="tier t-h">Highly cited · 1k–10k</span><span class="mono yr">2023</span></div><a class="ptitle" href="https://arxiv.org/abs/2303.12712">Sparks of artificial general intelligence: early experiments with GPT-4</a><div class="pauth">Bubeck, S. et al. · <i>arXiv</i></div><p>Argued GPT-4 showed early general intelligence; widely debated on method.</p><div class="pused mono">Used in Context for AGI claims</div></article><article class="paper" data-g="compare"><div class="ptop"><span class="tier t-e">Established · 100–1k</span><span class="mono yr">2023</span></div><a class="ptitle" href="https://doi.org/10.2139/ssrn.4573321">Navigating the jagged technological frontier</a><div class="pauth">Dell&#x27;Acqua, F. et al. · <i>Harvard Business School working paper</i></div><p>Field experiment with 758 BCG consultants: AI raised quality on tasks inside its frontier and lowered it on tasks outside.</p><div class="pused mono">Used in §4 jagged profile; §7 landscape</div></article></div>
+  <p class="note">Citation tiers are approximate orders of magnitude from Google Scholar as of mid-2026, not exact counts; the citation databases could not be queried when this page was built. Recent papers are too new to rank by citations and are included because they are the primary source for the numbers on this page.</p>
+</section>
+
+<section id="evidence">
+  <div class="sec-head">
+    <div class="eyebrow">14 · Evidence ledger</div>
+    <h2>Where every number comes from</h2>
+    <p>Each figure on this page was re-checked against its source on 29 September 2026. 28 entries: 10 primary source · 7 verified secondary · 3 search snippet · 3 aggregator · 3 author estimate · 1 unverified · 1 calculation. Four corrections came out of the check and are already applied above.</p>
+  </div>
+  <div class="dims">
+    <div class="dim"><strong>151 is the test's ceiling.</strong>It means all 35 Mensa Norway questions answered correctly, so "1 in 3,000" is a lower bound: the test cannot measure higher. The offline test tops out near 136, and the best score there is 135.</div>
+    <div class="dim"><strong>Claude Opus 5.5 on ARC-AGI-2 is 93.3%</strong>on the official ARC Prize results page, not the 91.7% an aggregator listed.</div>
+    <div class="dim"><strong>GPT-6 Astra's offline IQ is a measured 130,</strong>replacing the earlier estimate of 133.</div>
+    <div class="dim"><strong>ARC-AGI-3 has two numbers per model.</strong>ARC Prize's headline row shows 99.95% for GPT-6 and 35% for Gemini 3.8 Flash using provider-built harnesses; the standard harness gives 62.7% and 10.4%. This page uses the standard harness throughout.</div>
+  </div>
+  <div class="tbl"><table class="evt"><thead><tr><th>Claim</th><th>Value used</th><th>Evidence</th><th>Source</th><th>Note</th></tr></thead><tbody><tr><td>Top Mensa Norway (public) score</td><td class="m">151 (Claude Fable 5.1; GPT-6 Astra vision)</td><td><span class="ev ev-ok2">Verified secondary</span></td><td><a href="https://eu.36kr.com/en/p/4002779288277120">36Kr / KuCoin reporting TrackingAI</a></td><td class="note">151 = all 35 correct = the test&#x27;s maximum; true ability above 151 cannot be measured</td></tr><tr><td>Mensa Norway 145 cluster</td><td class="m">145 (GPT-5.6 Sol; Gemini 3.1 Pro)</td><td><span class="ev ev-ok2">Verified secondary</span></td><td><a href="https://www.kucoin.com/news/flash/ai-achieves-151-on-mensa-norway-iq-test-surpassing-99-97-of-humans">KuCoin reporting TrackingAI</a></td><td class="note"></td></tr><tr><td>Top offline-test score</td><td class="m">135 (GPT-5.6 Terra vision)</td><td><span class="ev ev-ok2">Verified secondary</span></td><td><a href="https://eu.36kr.com/en/p/4002779288277120">36Kr / KuCoin</a></td><td class="note">Offline test has 16 questions; maximum about 136</td></tr><tr><td>Offline score Fable 5.1 and GPT-6 Astra</td><td class="m">130 and 130</td><td><span class="ev ev-ok2">Verified secondary</span></td><td><a href="https://www.kucoin.com/news/flash/ai-achieves-151-on-mensa-norway-iq-test-surpassing-99-97-of-humans">KuCoin</a></td><td class="note">Astra was previously estimated at 133; corrected to measured 130</td></tr><tr><td>Offline Claude Opus 5 / Opus 5 MAX / Sol Ultra / Sol Ultra vision</td><td class="m">129 / 127 / 130 / 131</td><td><span class="ev ev-snip">Search snippet</span></td><td><a href="https://binaryverseai.com/ai-iq-test-2025/">BinaryVerse AI (site blocks automated reading)</a></td><td class="note">Primary tracker page renders by script; open trackingai.org/IQ to confirm</td></tr><tr><td>Grok-4.20 Expert Mensa score</td><td class="m">145 (April 2026)</td><td><span class="ev ev-snip">Search snippet</span></td><td><a href="https://www.visualcapitalist.com/ranked-the-smartest-ai-models-in-2026/">Visual Capitalist</a></td><td class="note"></td></tr><tr><td>Early top AI IQ history</td><td class="m">about 101 (early 2024); passed 120 (o1; Sep 2024); 135 (o3; 2025)</td><td><span class="ev ev-ok2">Verified secondary</span></td><td><a href="https://www.kucoin.com/news/flash/ai-achieves-151-on-mensa-norway-iq-test-surpassing-99-97-of-humans">KuCoin; Voronoi</a></td><td class="note">Article: best early-2024 model barely above human average</td></tr><tr><td>ARC-AGI-1 best</td><td class="m">98.5%</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://arcprize.org/results">ARC Prize results</a></td><td class="note"></td></tr><tr><td>ARC-AGI-2 GPT-6 Astra</td><td class="m">95.0%</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://arcprize.org/results">ARC Prize results</a></td><td class="note"></td></tr><tr><td>ARC-AGI-2 GPT-5.6 Sol</td><td class="m">92.5%</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://arcprize.org/results">ARC Prize results</a></td><td class="note"></td></tr><tr><td>ARC-AGI-2 Claude Opus 5.5</td><td class="m">93.3%</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://arcprize.org/results">ARC Prize results</a></td><td class="note">Corrected from 91.7% (aggregator BenchLM)</td></tr><tr><td>ARC-AGI-2 others</td><td class="m">Opus 5 90.4%; Fable 5.1 90.0%; Gemini 3.8 Flash 89.2%; Gemini 3.7 Flash 84.6%; Grok 4.6 67.1%</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://arcprize.org/results">ARC Prize results</a></td><td class="note"></td></tr><tr><td>ARC-AGI-2 average human</td><td class="m">66%</td><td><span class="ev ev-agg">Aggregator</span></td><td><a href="https://benchlm.ai/benchmarks/arc-agi-2">BenchLM</a></td><td class="note">Human panel 100%: every task solved by at least two people (ARC-AGI-2 paper)</td></tr><tr><td>ARC-AGI-1 human reference</td><td class="m">64% average; 98% panel (removed from chart)</td><td><span class="ev ev-mem">Unverified</span></td><td>Author recall of prior ARC studies</td><td class="note">Treat as approximate or remove</td></tr><tr><td>ARC-AGI-3 standard harness</td><td class="m">GPT-6 Astra 62.7; Opus 5 30.2; Gemini 3.8 Flash 10.4; GPT-5.6 Sol 7.8; Grok 4.6 2.1</td><td><span class="ev ev-agg">Aggregator</span></td><td><a href="https://llmlearner.com/rankings/arc-agi-3">LLMLearner</a></td><td class="note">Opus 5 30.16%; Sol 7.78%; Grok 4.6 2.11% also verified on ARC Prize results</td></tr><tr><td>ARC-AGI-3 headline row (best harness)</td><td class="m">GPT-6 99.95%; Gemini 3.8 Flash 35.00%</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://arcprize.org/results">ARC Prize results</a></td><td class="note">Includes provider-adapter harness; not comparable with standard harness; page uses standard</td></tr><tr><td>ARC-AGI-3 at launch</td><td class="m">all frontier models below 1% (Gemini 3.1 Pro 0.37%)</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://arxiv.org/abs/2603.24621">ARC-AGI-3 paper</a></td><td class="note">Humans solved 100% of environments</td></tr><tr><td>HLE top scores</td><td class="m">Opus 5.5 61.4%; Fable 5.1 59.1%</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://artificialanalysis.ai/evaluations/humanitys-last-exam">Artificial Analysis</a></td><td class="note"></td></tr><tr><td>HLE Fable 5 / Opus 5</td><td class="m">55.5% / 54.9%</td><td><span class="ev ev-agg">Aggregator</span></td><td><a href="https://pricepertoken.com/leaderboards/benchmark/hle">pricepertoken / modelgrep</a></td><td class="note"></td></tr><tr><td>AA Intelligence Index v4.3</td><td class="m">Opus 5.5 58; Fable 5.1 53; GPT-6 Astra 52.7</td><td><span class="ev ev-snip">Search snippet</span></td><td><a href="https://artificialanalysis.ai/leaderboards/models">Artificial Analysis; modelgrep</a></td><td class="note">Index versions differ; only v4.3 values are comparable</td></tr><tr><td>METR 50% horizon history</td><td class="m">GPT-4 4 min ... Opus 4.5 5 h 20 m; Opus 4.6 11 h 59 m; Mythos Preview at least 16 h</td><td><span class="ev ev-ok2">Verified secondary</span></td><td><a href="https://en.wikipedia.org/wiki/METR">Wikipedia METR</a></td><td class="note">METR page confirms the 16 h reliability limit</td></tr><tr><td>METR 80% horizon best</td><td class="m">3 h 6 m (Mythos Preview)</td><td><span class="ev ev-ok2">Verified secondary</span></td><td><a href="https://en.wikipedia.org/wiki/METR">Wikipedia METR</a></td><td class="note"></td></tr><tr><td>Doubling time</td><td class="m">131 days (TH1.1; post-2023)</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://metr.org/blog/2026-1-29-time-horizon-1-1/">METR blog</a></td><td class="note"></td></tr><tr><td>Flynn effect</td><td class="m">about 3 IQ points per decade</td><td><span class="ev ev-ok">Primary source</span></td><td><a href="https://doi.org/10.1037/0033-2909.101.2.171">Flynn (1987)</a></td><td class="note"></td></tr><tr><td>1 in 2970 people at IQ 151</td><td class="m">computed</td><td><span class="ev ev-calc">Calculation</span></td><td>Normal(100;15) tail</td><td class="note">Lower bound because 151 is the test ceiling</td></tr><tr><td>Nine-dimension profile scores</td><td class="m">see paper Table 2</td><td><span class="ev ev-est">Author estimate</span></td><td>Anchored to rows above where possible</td><td class="note">Not a published benchmark</td></tr><tr><td>Human-master model parameters</td><td class="m">H50=2000 h; k=0.5; beta=1.5</td><td><span class="ev ev-est">Author estimate</span></td><td>—</td><td class="note"></td></tr><tr><td>Offline IQ estimates (Grok 4.6; Gemini 3.1 Pro)</td><td class="m">Mensa minus 18</td><td><span class="ev ev-est">Author estimate</span></td><td>Mean public-offline gap</td><td class="note"></td></tr></tbody></table></div>
+  <p class="note">"Primary source" = read on the benchmark owner's page or a peer-reviewed paper. "Verified secondary" = read on a page that reports the tracker's figures (TrackingAI's own table loads by script and could not be read automatically). "Search snippet" = seen only in a search result; open the link to confirm. The ARC-AGI-1 human averages shown earlier came from memory and have been removed from the chart.</p>
+</section>
+
+<section>
+  <div class="sec-head">
+    <div class="eyebrow">Reading this fairly</div>
+    <h2>What the numbers do and don't say</h2>
+  </div>
+  <div class="dims">
+    <div class="dim"><strong>IQ tests measure skill, not learning.</strong>Chollet's definition of intelligence is how efficiently a learner turns experience into new skills. A model trained on millions of puzzles scoring 151 shows skill; ARC-AGI-3 is closer to measuring the learning.</div>
+    <div class="dim"><strong>Contamination inflates public scores.</strong>The 15–21 point public-to-offline drop is the clearest evidence. Use offline or held-out scores for any human comparison.</div>
+    <div class="dim"><strong>Harness and effort matter.</strong>Max-effort runs, agent scaffolds and vendor self-reports move scores by large amounts. Compare like with like.</div>
+    <div class="dim"><strong>Humans keep what AI lacks.</strong>Learning on the job from a handful of examples, long-lived memory, physical skill and reliable judgment over weeks of work.</div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Sources</div>
+  <div class="src">
+    <a href="https://trackingai.org/IQ">TrackingAI · IQ test (Mensa Norway & offline)</a>
+    <a href="https://binaryverseai.com/ai-iq-test-2025/">BinaryVerse · AI IQ test Sep 2026 snapshot</a>
+    <a href="https://www.visualcapitalist.com/ranked-the-smartest-ai-models-in-2026/">Visual Capitalist · Smartest AI models of 2026 (April)</a>
+    <a href="https://benchlm.ai/benchmarks/arc-agi-2">BenchLM · ARC-AGI-2 leaderboard</a>
+    <a href="https://llmlearner.com/rankings/arc-agi-3">ARC-AGI-3 leaderboard (ARC Prize data, 25 Sep)</a>
+    <a href="https://arxiv.org/abs/2603.24621">ARC-AGI-3 technical paper</a>
+    <a href="https://andrew.ooo/answers/arc-agi-3-standard-harness-vs-provider-adapter-2026/">GPT-6 Astra 62.7% vs 99.9% harness explainer</a>
+    <a href="https://artificialanalysis.ai/evaluations/humanitys-last-exam">Artificial Analysis · Humanity's Last Exam</a>
+    <a href="https://itproexpert.com/which-ai-model-to-use-sept-2026/">AA Intelligence Index v4.3 scores (Sep 2026)</a>
+    <a href="https://metr.org/time-horizons/">METR · Task-completion time horizons</a>
+    <a href="https://metr.org/blog/2026-1-29-time-horizon-1-1/">METR · Time Horizon 1.1 (131-day doubling)</a>
+    <a href="https://en.wikipedia.org/wiki/METR">Wikipedia · METR time-horizon table</a>
+  </div>
+</section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let C = {};
+function readTokens(){ C = {ink:css('--ink'),ink2:css('--ink-2'),ink3:css('--ink-3'),grid:css('--grid'),surface:css('--surface'),ai:css('--ai'),aiSoft:css('--ai-soft'),aiDeep:css('--ai-deep'),hum:css('--hum'),exp:css('--exp')}; }
+readTokens();
+
+// normal tail
+function erf(x){const t=1/(1+0.3275911*Math.abs(x));const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return x>=0?y:-y;}
+const tail = iq => 0.5*(1-erf((iq-100)/15/Math.SQRT2));
+const oneIn = iq => Math.round(1/tail(iq));
+document.getElementById('k1r').textContent = oneIn(151).toLocaleString();
+
+// ---------- data ----------
+const IQ = [
+  ['Claude Fable 5.1',151,130],
+  ['GPT-6 Astra Ultra (Vision)',151,null],
+  ['Claude Fable 5.1 (Vision)',145,null],
+  ['GPT-5.6 Sol Ultra',145,130],
+  ['Gemini 3.1 Pro',145,null],
+  ['Grok-4.20 Expert (Apr)',145,null],
+  ['Claude Opus 5',144,129],
+  ['Claude Opus 5 MAX',142,127],
+  ['GPT-5.6 Sol Ultra (Vision)',133,131],
+  ['GPT-5.6 Terra Ultra (Vision)',null,135],
+];
+const DIMS = [
+  {k:'Knowledge breadth',ai:97,avg:45,exp:70,a:'HLE: best model 61% across 100+ fields; no single human covers them. Experts score high only in their own field.'},
+  {k:'Static abstract reasoning',ai:92,avg:50,exp:95,a:'ARC-AGI-2: AI 95% vs 66% average person, 100% human panel. Offline IQ 135 ≈ top 1%.'},
+  {k:'Expert problem solving',ai:88,avg:20,exp:95,a:'Competition math, PhD-level science Q&A: models at or above expert baselines on most sets.'},
+  {k:'Novel interactive learning',ai:60,avg:85,exp:100,a:'ARC-AGI-3: best 62.7% of human efficiency; the median model is far lower (2–30%).'},
+  {k:'Long-horizon autonomy',ai:45,avg:65,exp:95,a:'METR: ~16 h at 50% success, ~3 h at 80%. People carry projects for weeks or months.'},
+  {k:'Sample efficiency',ai:30,avg:75,exp:90,a:'Humans learn a new tool or game from a few tries; models need training data or long in-context search.'},
+  {k:'Continual learning & memory',ai:15,avg:80,exp:90,a:'Deployed models do not update weights from experience; memory is bolted on. Judgment call.'},
+  {k:'Speed & scale',ai:99,avg:5,exp:10,a:'Thousands of tokens per second, parallel copies, no fatigue.'},
+  {k:'Embodied & social judgment',ai:20,avg:85,exp:90,a:'Physical skill, reading a room, stakes-aware judgment. Judgment call; little benchmark coverage.'},
+];
+const PRESETS = {
+  'IQ-test view':{w:[3,5,4,1,0,0,0,1,0],n:'Weights what classic IQ and exam benchmarks reward: knowledge and static puzzles (Spearman 1904; Cattell 1963).'},
+  'Chollet: adaptability':{w:[0,2,1,5,2,5,4,0,1],n:'Intelligence as skill-acquisition efficiency on novel tasks (Chollet 2019; Lake et al. 2017).'},
+  'Economic work':{w:[3,2,3,2,5,2,3,4,3],n:'What matters for doing a real job end to end: autonomy, reliability, speed and judgment (Schmidt & Hunter 1998; Dell\'Acqua et al. 2023).'},
+  'Balanced':{w:[1,1,1,1,1,1,1,1,1],n:'Every dimension counts equally, as Hendrycks et al. (2025) do with ten CHC domains at 10% each.'},
+};
+let W = PRESETS['Balanced'].w.slice(); let activePreset='Balanced';
+window.IQDATA={DIMS,getW:()=>W};
+
+// ---------- chart helpers ----------
+if(window.Chart){Chart.defaults.font.family = '"IBM Plex Sans", system-ui, sans-serif';
+Chart.defaults.font.size = 12;}
+const charts = {};
+function baseScales(opts={}){return {
+  x:Object.assign({grid:{color:C.grid,drawTicks:false},border:{color:C.grid},ticks:{color:C.ink2,padding:6}},opts.x||{}),
+  y:Object.assign({grid:{color:C.grid,drawTicks:false},border:{display:false},ticks:{color:C.ink2,padding:6}},opts.y||{})
+};}
+const tip = () => ({backgroundColor:C.surface,titleColor:C.ink,bodyColor:C.ink2,borderColor:C.grid,borderWidth:1,padding:10,displayColors:true,boxPadding:4});
+// vertical / horizontal reference lines plugin
+const refLines = {id:'refLines',afterDatasetsDraw(ch,_,o){
+  if(!o||!o.lines) return; const {ctx,chartArea:a,scales}=ch; ctx.save();
+  o.lines.forEach(l=>{
+    const s = scales[l.axis]; const p = s.getPixelForValue(l.value);
+    ctx.strokeStyle=l.color; ctx.lineWidth=l.width||1.5; ctx.setLineDash(l.dash||[]);
+    ctx.beginPath();
+    if(l.axis==='x'){ctx.moveTo(p,a.top);ctx.lineTo(p,a.bottom);} else {ctx.moveTo(a.left,p);ctx.lineTo(a.right,p);}
+    ctx.stroke(); ctx.setLineDash([]);
+    if(l.label){ctx.fillStyle=C.ink2;ctx.font='500 11px "IBM Plex Mono", monospace';
+      if(l.axis==='x'){ctx.textAlign=l.align||'left';ctx.fillText(l.label,p+(l.align==='right'?-6:6),a.top+12+(l.dy||0));}
+      else {ctx.textAlign='right';ctx.fillText(l.label,a.right-4,p-5);}}
+  }); ctx.restore();}};
+if(window.Chart) Chart.register(refLines);
+
+function build(){
+  Object.values(charts).forEach(c=>c.destroy());
+  readTokens();
+
+  // 1 bell
+  const pts=[]; for(let x=50;x<=160;x+=1){pts.push({x,y:Math.exp(-((x-100)**2)/(2*225))/(15*Math.sqrt(2*Math.PI))*100});}
+  charts.bell = new Chart(document.getElementById('bell'),{type:'line',
+    data:{datasets:[{data:pts,borderColor:C.hum,backgroundColor:C.hum+'33',fill:true,borderWidth:2,pointRadius:0,tension:.3}]},
+    options:{maintainAspectRatio:false,parsing:false,interaction:{mode:'nearest',intersect:false,axis:'x'},
+      plugins:{legend:{display:false},tooltip:Object.assign(tip(),{callbacks:{title:i=>'IQ '+i[0].parsed.x,label:i=>{const t=tail(i.parsed.x);return 'Scores above this: '+(t*100).toFixed(t<0.01?3:1)+'% of people';}}}),
+        refLines:{lines:[
+          {axis:'x',value:100,color:C.ink3,dash:[3,3],label:'Human mean 100'},
+          {axis:'x',value:130,color:C.ink3,dash:[3,3],label:'Mensa ≈130',dy:16},
+          {axis:'x',value:135,color:C.aiDeep,width:2.5,label:'AI offline 135 · top 1%',dy:34},
+          {axis:'x',value:151,color:C.ai,width:2.5,label:'AI public 151',align:'right',dy:52},
+        ]}},
+      scales:baseScales({x:{type:'linear',min:50,max:160,title:{display:true,text:'IQ',color:C.ink3}},y:{title:{display:true,text:'% of population per point',color:C.ink3},ticks:{color:C.ink2,callback:v=>v.toFixed(1)}}})}});
+
+  // 2 IQ bars
+  charts.iq = new Chart(document.getElementById('iq'),{type:'bar',
+    data:{labels:IQ.map(r=>r[0]),datasets:[
+      {label:'Mensa Norway (public)',data:IQ.map(r=>r[1]),backgroundColor:C.aiSoft,borderRadius:4,borderSkipped:'start',barPercentage:.8,categoryPercentage:.8},
+      {label:'Offline (never online)',data:IQ.map(r=>r[2]),backgroundColor:C.aiDeep,borderRadius:4,borderSkipped:'start',barPercentage:.8,categoryPercentage:.8}]},
+    options:{indexAxis:'y',maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:Object.assign(tip(),{callbacks:{label:i=>i.dataset.label+': '+i.parsed.x+'  (≈1 in '+oneIn(i.parsed.x).toLocaleString()+' humans)'}}),
+        refLines:{lines:[{axis:'x',value:100,color:C.hum,dash:[4,3],label:'Human mean'},{axis:'x',value:130,color:C.hum,dash:[4,3],label:'Mensa',dy:0}]}},
+      scales:baseScales({x:{min:80,max:160,title:{display:true,text:'IQ score',color:C.ink3}},y:{grid:{display:false},ticks:{color:C.ink,autoSkip:false}}})}});
+
+  // 3 ARC
+  charts.arc = new Chart(document.getElementById('arc'),{type:'bar',
+    data:{labels:['ARC-AGI-1','ARC-AGI-2','ARC-AGI-3'],datasets:[
+      {label:'Best AI',data:[98.5,95,62.7],backgroundColor:C.ai,borderRadius:4,borderSkipped:'start'},
+      {label:'Average individual human',data:[null,66,null],backgroundColor:C.hum,borderRadius:4,borderSkipped:'start'},
+      {label:'Human panel / baseline',data:[null,100,100],backgroundColor:C.exp,borderRadius:4,borderSkipped:'start'}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Best score, % (Sep 2026)',color:C.ink2,align:'start',font:{weight:'500'}},tooltip:Object.assign(tip(),{callbacks:{label:i=>i.dataset.label+': '+i.parsed.y+'%'}})},
+      scales:baseScales({y:{min:0,max:100,ticks:{color:C.ink2,callback:v=>v+'%'}},x:{grid:{display:false}}})}});
+
+  charts.arc3 = new Chart(document.getElementById('arc3'),{type:'line',
+    data:{labels:['Mar 2026','Jul 2026','Aug 2026','Sep 2026'],datasets:[
+      {label:'Best AI on ARC-AGI-3',data:[0.37,30.2,30.2,62.7],borderColor:C.ai,backgroundColor:C.ai+'22',fill:true,borderWidth:2,pointRadius:4,pointBackgroundColor:C.ai,pointBorderColor:C.surface,pointBorderWidth:2,tension:0}]},
+    options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},title:{display:true,text:'ARC-AGI-3 top score over 2026',color:C.ink2,align:'start',font:{weight:'500'}},
+        tooltip:Object.assign(tip(),{callbacks:{label:i=>['Gemini 3.1 Pro 0.37%','Claude Opus 5 30.2%','Claude Opus 5 30.2%','GPT-6 Astra 62.7%'][i.dataIndex]}}),
+        refLines:{lines:[{axis:'y',value:100,color:C.exp,dash:[4,3],label:'Human baseline 100%'}]}},
+      scales:baseScales({y:{min:0,max:110,ticks:{color:C.ink2,callback:v=>v<=100?v+'%':''}},x:{grid:{display:false}}})}});
+
+  // 4 radar
+  charts.radar = new Chart(document.getElementById('radar'),{type:'radar',
+    data:{labels:DIMS.map(d=>d.k.split(' & ').join(' &\n').split('\n')),datasets:[
+      {label:'Frontier AI',data:DIMS.map(d=>d.ai),borderColor:C.ai,backgroundColor:C.ai+'26',borderWidth:2,pointRadius:4,pointBackgroundColor:C.ai,pointBorderColor:C.surface,pointBorderWidth:2},
+      {label:'Average adult',data:DIMS.map(d=>d.avg),borderColor:C.hum,backgroundColor:C.hum+'1f',borderWidth:2,pointRadius:4,pointBackgroundColor:C.hum,pointBorderColor:C.surface,pointBorderWidth:2},
+      {label:'Top human expert',data:DIMS.map(d=>d.exp),borderColor:C.exp,backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],pointRadius:4,pointBackgroundColor:C.exp,pointBorderColor:C.surface,pointBorderWidth:2}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tip()},
+      scales:{r:{min:0,max:100,ticks:{stepSize:25,color:C.ink3,backdropColor:'transparent'},grid:{color:C.grid},angleLines:{color:C.grid},pointLabels:{color:C.ink,font:{size:11.5}}}}}});
+
+  // 5 composite
+  charts.comp = new Chart(document.getElementById('comp'),{type:'bar',
+    data:{labels:['Frontier AI','Average adult','Top human expert'],datasets:[{data:composite(),backgroundColor:[C.ai,C.hum,C.exp],borderRadius:4,borderSkipped:'start',barPercentage:.6}]},
+    options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:Object.assign(tip(),{callbacks:{label:i=>'Composite: '+i.parsed.x.toFixed(1)}})},
+      scales:baseScales({x:{min:0,max:100},y:{grid:{display:false},ticks:{color:C.ink,font:{weight:'500'}}}})}});
+
+  // 6 IQ over time
+  charts.iqtime = new Chart(document.getElementById('iqtime'),{type:'line',
+    data:{labels:['Mar 2024','Sep 2024','Mid 2025','Jan 2026','Apr 2026','Sep 2026'],datasets:[
+      {label:'Top AI, public test',data:[101,120,135,142,145,151],borderColor:C.ai,borderWidth:2,pointRadius:4,pointBackgroundColor:C.ai,pointBorderColor:C.surface,pointBorderWidth:2},
+      {label:'Top AI, offline test',data:[null,null,null,128,null,135],spanGaps:true,borderColor:C.aiDeep,borderWidth:2,borderDash:[5,4],pointRadius:4,pointBackgroundColor:C.aiDeep,pointBorderColor:C.surface,pointBorderWidth:2}]},
+    options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},
+        tooltip:Object.assign(tip(),{callbacks:{afterTitle:i=>['Claude 3 Opus','o1-preview','o3','Gemini 3 Pro / GPT-5.2 Thinking (offline)','Grok-4.20 / GPT-5.4 Pro','Claude Fable 5.1 / GPT-6 Astra; GPT-5.6 Terra (offline)'][i[0].dataIndex]}}),
+        refLines:{lines:[{axis:'y',value:100,color:C.hum,dash:[4,3],label:'Human mean 100 (Flynn: +3/decade)'},{axis:'y',value:130,color:C.hum,dash:[2,4],label:'Mensa 130'}]}},
+      scales:baseScales({y:{min:90,max:160},x:{grid:{display:false}}})}});
+
+  // METR
+  const M=[['GPT-2','2019-02',0.033],['GPT-3','2020-05',0.15],['GPT-3.5','2022-03',0.6],['GPT-4','2023-03',4],['GPT-4o','2024-05',6],['Claude 3.5 Sonnet (new)','2024-10',20],['o1','2024-12',38],['Claude 3.7 Sonnet','2025-02',60],['Claude Opus 4.5','2025-11',300],['Claude Opus 4.6','2026-02',719],['Claude Mythos Preview (≥)','2026-04',960]];
+  const toX = s=>{const [y,m]=s.split('-').map(Number);return y+(m-1)/12;};
+  const fmt = m=> m<1? Math.round(m*60)+' s' : m<60? Math.round(m)+' min' : (m/60).toFixed(m<600?1:0)+' h';
+  charts.metr = new Chart(document.getElementById('metr'),{type:'line',
+    data:{datasets:[{label:'50% time horizon',data:M.map(r=>({x:toX(r[1]),y:r[2],n:r[0]})),borderColor:C.ai,borderWidth:2,pointRadius:4,pointBackgroundColor:C.ai,pointBorderColor:C.surface,pointBorderWidth:2,tension:0}]},
+    options:{maintainAspectRatio:false,parsing:false,
+      plugins:{legend:{display:false},tooltip:Object.assign(tip(),{callbacks:{title:i=>i[0].raw.n,label:i=>'50% horizon: '+fmt(i.raw.y)}}),
+        refLines:{lines:[{axis:'y',value:480,color:C.hum,dash:[4,3],label:'1 workday'},{axis:'y',value:2400,color:C.hum,dash:[4,3],label:'1 work-week'},{axis:'y',value:10080/1.0*1,color:'transparent'}]}},
+      scales:baseScales({x:{type:'linear',min:2019,max:2027,ticks:{color:C.ink2,stepSize:1,callback:v=>String(v)}},
+        y:{type:'logarithmic',min:0.02,max:5000,ticks:{color:C.ink2,callback:v=>({0.1:'6 s',1:'1 min',10:'10 min',60:'1 h',100:'',1000:'17 h'}[v]??(v===480?'':''))},afterBuildTicks:ax=>{ax.ticks=[0.1,1,10,60,480,2400].map(v=>({value:v}));}}})}});
+  charts.metr.options.scales.y.ticks.callback=v=>({0.1:'6 s',1:'1 min',10:'10 min',60:'1 h',480:'8 h',2400:'40 h'}[v]||'');
+  charts.metr.update('none');
+}
+
+function composite(){
+  const tot = W.reduce((a,b)=>a+b,0)||1;
+  return ['ai','avg','exp'].map(k=>DIMS.reduce((s,d,i)=>s+d[k]*W[i],0)/tot);
+}
+function updateComposite(){
+  const v = composite();
+  if(charts.comp){charts.comp.data.datasets[0].data=v;charts.comp.update();}
+  const names=['Frontier AI','the average adult','a top human expert'];
+  const order=[0,1,2].sort((a,b)=>v[b]-v[a]);
+  const lead=v[0]-v[1];
+  document.getElementById('verdict').innerHTML = 'Leader: <b>'+names[order[0]].replace(/^\w/,c=>c.toUpperCase())+'</b> ('+v[order[0]].toFixed(1)+'). Frontier AI is <b>'+(lead>=0?'+':'')+lead.toFixed(1)+'</b> vs the average adult and <b>'+((v[0]-v[2])>=0?'+':'')+(v[0]-v[2]).toFixed(1)+'</b> vs a top expert.';
+  document.dispatchEvent(new CustomEvent('weights'));
+  document.getElementById('presetNote').textContent = activePreset? PRESETS[activePreset].n : 'Custom weights.';
+  document.querySelectorAll('.sl output').forEach((o,i)=>o.textContent='×'+W[i]);
+  document.querySelectorAll('.sl input').forEach((s,i)=>s.value=W[i]);
+  document.querySelectorAll('#presets button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===activePreset));
+}
+
+// dims list
+document.getElementById('dims').innerHTML = DIMS.map(d=>`<div class="dim"><strong>${d.k}</strong><span class="mono" style="font-size:12px">AI ${d.ai} · avg ${d.avg} · expert ${d.exp}</span>${d.a}</div>`).join('');
+// presets
+document.getElementById('presets').innerHTML = Object.keys(PRESETS).map(p=>`<button type="button" data-p="${p}">${p}</button>`).join('');
+document.getElementById('presets').addEventListener('click',e=>{const p=e.target.dataset.p;if(!p)return;activePreset=p;W=PRESETS[p].w.slice();updateComposite();});
+// sliders
+document.getElementById('sliders').innerHTML = DIMS.map((d,i)=>`<div class="sl"><label for="w${i}">${d.k}</label><output for="w${i}"></output><input type="range" id="w${i}" min="0" max="5" step="1" value="${W[i]}"></div>`).join('');
+document.getElementById('sliders').addEventListener('input',e=>{if(!e.target.id)return;W[+e.target.id.slice(1)]=+e.target.value;activePreset=null;
+  for(const [k,p] of Object.entries(PRESETS)) if(p.w.every((x,i)=>x===W[i])) activePreset=k; updateComposite();});
+
+// table
+const T=[
+ ['Claude Opus 5.5','—','—','93.3%','—','61.4%','58'],
+ ['Claude Fable 5.1','151','130','90.0%','—','59.1%','53'],
+ ['GPT-6 Astra','151 (vision)','130','95.0%','62.7%','—','52.7'],
+ ['GPT-5.6 Sol','145','130','92.5%','7.8%','—','—'],
+ ['Claude Opus 5','144','129','90.4%','30.2%','54.9%','—'],
+ ['Claude Fable 5','—','—','89.2%','—','55.5%','—'],
+ ['GPT-5.6 Terra','—','135 (vision)','—','—','—','—'],
+ ['Gemini 3.8 Flash','—','—','89.2%','10.4%','—','—'],
+ ['Gemini 3.1 Pro','145','—','77.1%','0.37%','—','—'],
+ ['Grok 4.6 / 4.20','145 (4.20)','—','67.1%','2.1%','—','46 (4.7)'],
+];
+const H=[['Average adult','100','100','66%','—','—','—'],['Human panel / baseline','—','—','100%','100%','Experts: own field only','—']];
+const cell=v=>`<td class="${v==='—'?'na':'m'}">${v}</td>`;
+document.getElementById('tbl').innerHTML='<thead><tr><th>Model</th><th>Mensa Norway</th><th>Offline IQ</th><th>ARC-AGI-2</th><th>ARC-AGI-3</th><th>HLE</th><th>AA Index</th></tr></thead><tbody>'+
+ T.map(r=>'<tr><td>'+r[0]+'</td>'+r.slice(1).map(cell).join('')+'</tr>').join('')+
+ H.map(r=>'<tr class="human"><td>'+r[0]+'</td>'+r.slice(1).map(cell).join('')+'</tr>').join('')+'</tbody>';
+
+function go(){ if(!window.Chart) return; build(); updateComposite(); }
+go();
+// theme changes
+try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',go); }catch(e){}
+new MutationObserver(go).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let T={};
+const readT=()=>{T={ink:css('--ink'),ink2:css('--ink-2'),ink3:css('--ink-3'),grid:css('--grid'),line:css('--line'),surface:css('--surface'),bg:css('--bg'),ai:css('--ai'),aiSoft:css('--ai-soft'),aiDeep:css('--ai-deep'),hum:css('--hum'),exp:css('--exp')};};
+readT();
+const dark=()=>{const t=document.documentElement.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;};
+const V3=(x,y,z)=>window.THREE?new THREE.Vector3(x,y,z):undefined;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sig=x=>1/(1+Math.exp(-x));
+function ninv(p){const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.357751867269,-30.66479806614716,2.506628277459239],b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],c=[-0.007784894002430293,-0.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],d=[0.007784695709041462,0.3224671290700398,2.445134137142996,3.754408661907416],pl=0.02425;let q,r;
+ if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const R=rng(20260927);
+const gauss=()=>{let u=0;while(!u)u=R();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*R());};
+const hex2rgb=h=>{h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];};
+const lerpC=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
+const ramp=(stops,t)=>{t=Math.max(0,Math.min(1,t));const n=stops.length-1,i=Math.min(n-1,Math.floor(t*n));return lerpC(stops[i],stops[i+1],t*n-i);};
+
+// ---------- model constants ----------
+const T0=Date.UTC(2026,4,8), DAY=864e5, TD=131, H0=16;
+const AI={k:0.574,beta:6.0,n0:0.2}, MS={H:2000,k:0.5,beta:1.5,n0:0.2};
+const P=(n,h,H,k,b,n0)=>sig(k*Math.log2(H/h)-b*(n-n0));
+const hAt=ms=>H0*Math.pow(2,(ms-T0)/DAY/TD);
+const Y0=Math.log2(1/60), Y1=Math.log2(2000);
+function monthDate(m){const d=new Date(Date.UTC(2026,8,15));d.setUTCMonth(d.getUTCMonth()+Math.floor(m));d.setUTCDate(15+Math.round((m-Math.floor(m))*28));return d;}
+
+// ================= THREE viewer =================
+function Viewer(el,opt){
+  if(!window.THREE){el.insertAdjacentHTML('beforeend','<div class="fail">The 3D library did not load. Reload the page to try again.</div>');return null;}
+  let renderer;
+  try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});}catch(e){el.insertAdjacentHTML('beforeend','<div class="fail">This device or browser has WebGL turned off, so the 3D view cannot draw.</div>');return null;}
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  el.insertBefore(renderer.domElement,el.firstChild);
+  const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(opt.fov||38,1,0.05,100), target=opt.target||new THREE.Vector3();
+  let theta=opt.theta, phi=opt.phi, dist=opt.dist, auto=!reduced, drag=false, lx=0, ly=0, idle=null, visible=true;
+  const place=()=>{cam.position.set(target.x+dist*Math.cos(phi)*Math.sin(theta),target.y+dist*Math.sin(phi),target.z+dist*Math.cos(phi)*Math.cos(theta));cam.lookAt(target);};
+  const cv=renderer.domElement;
+  cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;auto=false;clearTimeout(idle);try{cv.setPointerCapture(e.pointerId);}catch(_){}});
+  cv.addEventListener('pointermove',e=>{if(!drag)return;theta-=(e.clientX-lx)*0.008;phi=Math.max(0.05,Math.min(1.45,phi+(e.clientY-ly)*0.006));lx=e.clientX;ly=e.clientY;});
+  const up=()=>{if(!drag)return;drag=false;clearTimeout(idle);if(!reduced)idle=setTimeout(()=>auto=true,4000);};
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  const size=()=>{const w=el.clientWidth,h=el.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);cam.aspect=w/h;cam.fov=(opt.fov||38)*(w<520?1.35:1);cam.updateProjectionMatrix();};
+  try{new ResizeObserver(size).observe(el);}catch(_){window.addEventListener('resize',size);}
+  try{new IntersectionObserver(es=>{visible=es[0].isIntersecting;}).observe(el);}catch(_){}
+  size();
+  const api={scene,cam,renderer,frame:null,clear(){while(scene.children.length){const o=scene.children.pop();o.traverse(c=>{if(c.geometry)c.geometry.dispose();if(c.material){(Array.isArray(c.material)?c.material:[c.material]).forEach(m=>{if(m.map)m.map.dispose();m.dispose();});}});}}};
+  const loop=t=>{requestAnimationFrame(loop);if(!visible)return;if(auto)theta+=0.0022;if(api.frame)api.frame(t);place();renderer.render(scene,cam);};
+  requestAnimationFrame(loop);
+  return api;
+}
+function label(text,color,h=0.085,weight=500){
+  const fs=48,c=document.createElement('canvas'),ctx=c.getContext('2d');const font=`${weight} ${fs}px "IBM Plex Sans", system-ui, sans-serif`;
+  ctx.font=font;const w=Math.ceil(ctx.measureText(text).width)+16;c.width=w;c.height=fs+18;
+  ctx.font=font;ctx.fillStyle=color;ctx.textBaseline='middle';ctx.fillText(text,8,c.height/2);
+  const tex=new THREE.CanvasTexture(c);tex.minFilter=THREE.LinearFilter;
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,depthWrite:false}));
+  s.scale.set(h*w/c.height,h,1);s.renderOrder=10;return s;
+}
+function dotTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.55,'rgba(255,255,255,.9)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);const t=new THREE.CanvasTexture(c);return t;}
+function line(pts,color,opacity=1){const g=new THREE.BufferGeometry().setFromPoints(pts.map(p=>new THREE.Vector3(...p)));return new THREE.Line(g,new THREE.LineBasicMaterial({color,transparent:opacity<1,opacity}));}
+
+// ================= 7. Landscape =================
+const NX=36, NY=54;
+const lv=document.getElementById('land')?Viewer(document.getElementById('land'),{theta:0.72,phi:0.52,dist:5.1,target:V3(0,0.35,0)}):null;
+let aiMesh=null, aiWire=null, aiFront=null, curH=hAt(Date.UTC(2026,8,15));
+const toX=n=>-1+2*n, toZ=y=>1.3-2.6*(y-Y0)/(Y1-Y0), HT=1.15;
+function buildSurf(fn,stops,opacity){
+  const pos=new Float32Array((NX+1)*(NY+1)*3), col=new Float32Array(pos.length), idx=[];
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));
+  for(let j=0;j<NY;j++)for(let i=0;i<NX;i++){const a=j*(NX+1)+i,b=a+1,c=a+NX+1,d=c+1;idx.push(a,c,b,b,c,d);}
+  g.setIndex(idx);fillSurf(g,fn,stops);
+  const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide,transparent:opacity<1,opacity,depthWrite:opacity>=1}));
+  const w=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:dark()?0xffffff:0x0b0b0b,wireframe:true,transparent:true,opacity:dark()?0.07:0.06}));
+  return [m,w];
+}
+function fillSurf(g,fn,stops){
+  const pos=g.attributes.position.array,col=g.attributes.color.array;let k=0;
+  for(let j=0;j<=NY;j++){const y=Y0+(Y1-Y0)*j/NY;for(let i=0;i<=NX;i++){const n=i/NX,p=fn(n,2**y);
+    pos[k]=toX(n);pos[k+1]=p*HT;pos[k+2]=toZ(y);const c=ramp(stops,p);col[k]=c[0]/255;col[k+1]=c[1]/255;col[k+2]=c[2]/255;k+=3;}}
+  g.attributes.position.needsUpdate=true;g.attributes.color.needsUpdate=true;g.computeVertexNormals();
+}
+function frontierTube(H,k,b,n0,color){
+  const pts=[];for(let i=0;i<=40;i++){const n=i/40,y=Math.log2(H)-b*(n-n0)/k;if(y>=Y0&&y<=Y1)pts.push(new THREE.Vector3(toX(n),0.5*HT+0.004,toZ(y)));}
+  if(pts.length<2)return new THREE.Group();
+  return new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),60,0.014,6,false),new THREE.MeshBasicMaterial({color}));
+}
+const aiStops=()=>dark()?[hex2rgb('#184f95'),hex2rgb('#3987e5'),hex2rgb('#b7d3f6')]:[hex2rgb('#cde2fb'),hex2rgb('#3987e5'),hex2rgb('#0d366b')];
+const msStops=()=>dark()?[hex2rgb('#0b4a33'),hex2rgb('#199e70'),hex2rgb('#a6ebcf')]:[hex2rgb('#d3f3e6'),hex2rgb('#1baf7a'),hex2rgb('#0b5a3e')];
+function buildLand(){
+  if(!lv)return; lv.clear(); const S=lv.scene;
+  S.add(new THREE.AmbientLight(0xffffff,dark()?0.75:0.8));const dl=new THREE.DirectionalLight(0xffffff,0.55);dl.position.set(2,4,3);S.add(dl);
+  const [mm,mw]=buildSurf((n,h)=>P(n,h,MS.H,MS.k,MS.beta,MS.n0),msStops(),0.5);
+  [aiMesh,aiWire]=buildSurf((n,h)=>P(n,h,curH,AI.k,AI.beta,AI.n0),aiStops(),1);
+  S.add(aiMesh,aiWire,mm,mw);
+  S.add(frontierTube(MS.H,MS.k,MS.beta,MS.n0,T.exp));
+  aiFront=frontierTube(curH,AI.k,AI.beta,AI.n0,T.ai);S.add(aiFront);
+  // frame & grid
+  const gc=T.ink3, zf=1.3, zb=-1.3;
+  S.add(line([[-1,0,zf],[1,0,zf],[1,0,zb],[-1,0,zb],[-1,0,zf]],gc,.7));
+  for(const p of [0.25,0.5,0.75,1]){S.add(line([[-1,p*HT,zb],[1,p*HT,zb]],gc,p===0.5?.6:.25));S.add(line([[-1,p*HT,zb],[-1,p*HT,zf]],gc,p===0.5?.6:.25));}
+  S.add(line([[-1,0,zb],[-1,HT,zb]],gc,.7));S.add(line([[1,0,zb],[1,HT,zb]],gc,.4));S.add(line([[-1,0,zf],[-1,HT,zf]],gc,.4));
+  const add=(s,x,y,z)=>{s.position.set(x,y,z);S.add(s);};
+  [['0%',0],['50%',0.5],['100%',1]].forEach(([t,p])=>add(label(t,T.ink2,0.07),-1.12,p*HT,zb));
+  add(label('P(success)',T.ink,0.08,600),-1.2,HT+0.15,zb);
+  [[0,'familiar'],[0.5,'0.5'],[1,'never seen']].forEach(([n,t])=>add(label(t,T.ink2,0.07),toX(n),-0.08,zf+0.14));
+  add(label('Task novelty →',T.ink,0.085,600),0,-0.2,zf+0.32);
+  [[1/60,'1 min'],[1,'1 h'],[8,'1 day'],[40,'1 week'],[167,'1 month'],[2000,'1 year']].forEach(([h,t])=>add(label(t,T.ink2,0.07),1.18,-0.02,toZ(Math.log2(h))));
+  add(label('Expert task length →',T.ink,0.085,600),1.35,-0.2,-0.2);
+  add(label('Human master',T.exp,0.09,600),-0.55,HT*1.02,0.55);
+  const aiL=label('Frontier AI',T.ai,0.09,600);aiL.name='aiL';add(aiL,-0.6,HT*0.97,1.25);
+}
+function setLandDate(m){
+  const d=monthDate(m);curH=hAt(d.getTime());
+  document.getElementById('tDateOut').textContent=d.toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})+' · H₅₀ '+(curH<100?curH.toFixed(1):Math.round(curH).toLocaleString())+' h';
+  let win=0,tot=0;for(let j=0;j<=24;j++)for(let i=0;i<=20;i++){const n=i/20,h=2**(Y0+(Y1-Y0)*j/24);tot++;if(P(n,h,MS.H,MS.k,MS.beta,MS.n0)-P(n,h,curH,AI.k,AI.beta,AI.n0)>0.25)win++;}
+  document.getElementById('gapOut').textContent='Master ahead by >25 pts on '+Math.round(win/tot*100)+'% of the task space';
+  if(!lv||!aiMesh)return;
+  fillSurf(aiMesh.geometry,(n,h)=>P(n,h,curH,AI.k,AI.beta,AI.n0),aiStops());
+  lv.scene.remove(aiFront);aiFront.traverse(c=>{if(c.geometry)c.geometry.dispose();});aiFront=frontierTube(curH,AI.k,AI.beta,AI.n0,T.ai);lv.scene.add(aiFront);
+}
+const tDate=document.getElementById('tDate'), playBtn=document.getElementById('playLand');
+let playing=null;
+tDate.addEventListener('input',()=>{playing=null;playBtn.textContent='▶ Run simulation 2026 → 2028';setLandDate(+tDate.value);});
+playBtn.addEventListener('click',()=>{
+  if(playing){playing=null;playBtn.textContent='▶ Run simulation 2026 → 2028';return;}
+  const start=performance.now(),from=-6,to=24,dur=reduced?1:10000;playBtn.textContent='❚❚ Pause';
+  playing=start;const step=now=>{if(playing!==start)return;const u=Math.min(1,(now-start)/dur),m=from+(to-from)*u;tDate.value=Math.round(m);setLandDate(m);
+    if(u<1)requestAnimationFrame(step);else{playing=null;playBtn.textContent='↺ Replay simulation';}};requestAnimationFrame(step);
+});
+
+// ================= 9. Capability space =================
+const D=(window.IQDATA&&window.IQDATA.DIMS)||[];
+const avgIdx=(k,idx)=>idx.reduce((s,i)=>s+D[i][k],0)/idx.length;
+const prof=k=>D.length?[avgIdx(k,[0,1,2]),avgIdx(k,[3,5,6]),avgIdx(k,[4,8])]:[50,50,50];
+const TRAJ=[['2023',60,5,8],['2024',72,8,12],['2025',84,14,20],['Mar 2026',89,18,26],['Sep 2026',...prof('ai')]];
+const CLOUD=[];(function(){const m=prof('avg');const f=v=>Math.max(0,Math.min(100,v));for(let i=0;i<1800;i++){const g=gauss();CLOUD.push([f(m[0]+13*(0.6*g+0.8*gauss())),f(m[1]+10*(0.6*g+0.8*gauss())),f(m[2]+10*(0.6*g+0.8*gauss())),R()]);}})();
+// axes: x = Knowledge, y (up) = Adaptability, z = Agency
+const V=(k,a,g)=>new THREE.Vector3(k/50-1,a/50-1,1-g/50);
+const sv=document.getElementById('space')?Viewer(document.getElementById('space'),{theta:0.85,phi:0.35,dist:5.1,target:V3(0.05,-0.12,0)}):null;
+let head=null, glow=null, curve=null;
+function buildSpace(){
+  if(!sv)return; sv.clear(); const S=sv.scene;
+  const pos=new Float32Array(CLOUD.length*3), col=new Float32Array(CLOUD.length*3), base=hex2rgb(T.hum);
+  CLOUD.forEach((c,i)=>{const v=V(c[0],c[1],c[2]);pos.set([v.x,v.y,v.z],i*3);const t=0.75+0.5*c[3];col.set([Math.min(1,base[0]/255*t),Math.min(1,base[1]/255*t),Math.min(1,base[2]/255*t)],i*3);});
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));
+  const tex=dotTex();
+  S.add(new THREE.Points(g,new THREE.PointsMaterial({size:0.045,map:tex,vertexColors:true,transparent:true,opacity:dark()?0.8:0.7,depthWrite:false,alphaTest:0.05})));
+  // box + axes
+  const box=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(2,2,2)),new THREE.LineBasicMaterial({color:T.ink3,transparent:true,opacity:.35}));S.add(box);
+  for(const v of [-0.5,0,0.5]){S.add(line([[-1,-1,v],[1,-1,v]],T.ink3,.18));S.add(line([[v,-1,-1],[v,-1,1]],T.ink3,.18));}
+  const add=(s,x,y,z)=>{s.position.set(x,y,z);S.add(s);};
+  add(label('Knowledge & reasoning →',T.ink,0.09,600),0,-1.16,1.18);
+  add(label('Adaptability ↑',T.ink,0.09,600),-1.12,1.12,1.0);
+  add(label('Agency & grounding →',T.ink,0.09,600),1.2,-1.16,0);
+  [0,50,100].forEach(v=>{add(label(String(v),T.ink2,0.065),v/50-1,-1.07,1.07);add(label(String(v),T.ink2,0.065),-1.08,v/50-1,1.02);});
+  // AI path
+  curve=new THREE.CatmullRomCurve3(TRAJ.map(t=>V(t[1],t[2],t[3])));
+  S.add(new THREE.Mesh(new THREE.TubeGeometry(curve,120,0.018,8,false),new THREE.MeshBasicMaterial({color:T.ai})));
+  TRAJ.forEach((t,i)=>{const v=V(t[1],t[2],t[3]);const s=new THREE.Mesh(new THREE.SphereGeometry(i===4?0.045:0.028,16,12),new THREE.MeshBasicMaterial({color:T.ai}));s.position.copy(v);S.add(s);add(label(t[0],T.ai,0.07,600),v.x,v.y+0.1,v.z);});
+  // extrapolated dashed direction
+  const last=V(...TRAJ[4].slice(1)), prev=V(...TRAJ[3].slice(1)), dir=last.clone().sub(prev).normalize().multiplyScalar(0.45);
+  const ext=last.clone().add(dir);const dl=new THREE.Line(new THREE.BufferGeometry().setFromPoints([last,ext]),new THREE.LineDashedMaterial({color:T.ai,dashSize:0.04,gapSize:0.03}));dl.computeLineDistances();S.add(dl);
+  // humans
+  const a=prof('avg'),e=prof('exp');
+  const av=new THREE.Mesh(new THREE.OctahedronGeometry(0.06),new THREE.MeshBasicMaterial({color:T.hum}));av.position.copy(V(...a));S.add(av);add(label('Average adult',T.ink,0.08,600),av.position.x,av.position.y+0.13,av.position.z);
+  const ex=new THREE.Mesh(new THREE.SphereGeometry(0.06,20,14),new THREE.MeshBasicMaterial({color:T.exp}));ex.position.copy(V(...e));S.add(ex);add(label('Human master',T.exp,0.085,600),ex.position.x,ex.position.y+0.13,ex.position.z);
+  // moving head
+  head=new THREE.Mesh(new THREE.SphereGeometry(0.035,16,12),new THREE.MeshBasicMaterial({color:0xffffff}));S.add(head);
+  glow=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex(),color:T.ai,transparent:true,opacity:.9,depthWrite:false}));glow.scale.set(0.22,0.22,1);S.add(glow);
+  sv.frame=t=>{if(!curve)return;const u=reduced?1:((t/6000)%1.15);const p=curve.getPointAt(Math.min(1,u));head.position.copy(p);glow.position.copy(p);const s=0.18+0.06*Math.sin(t/300);glow.scale.set(s,s,1);};
+}
+
+// ================= 8. Hex density (canvas) =================
+const N=20000,PX=new Float32Array(N),PY=new Float32Array(N);
+for(let i=0;i<N;i++){const g1=gauss(),g2=gauss();PX[i]=g1;PY[i]=0.6*g1+0.8*g2;}
+const zs=iq=>(iq-100)/15, za=s=>ninv(s/200);
+const MODELS=[
+  {n:'Claude Opus 5',x:zs(129),y:za(30.2),m:true,d:'Offline IQ 129 · ARC-AGI-3 30.2%'},
+  {n:'GPT-5.6 Sol',x:zs(130),y:za(7.8),m:true,d:'Offline IQ 130 · ARC-AGI-3 7.8%'},
+  {n:'GPT-6 Astra',x:zs(130),y:za(62.7),m:true,d:'Offline IQ 130 · ARC-AGI-3 62.7%'},
+  {n:'Grok 4.6',x:zs(127),y:za(2.1),m:false,d:'Offline IQ est. 127 (from Grok-4.20) · ARC-AGI-3 2.1%'},
+  {n:'Gemini 3.1 Pro (Mar)',x:zs(127),y:za(0.37),m:false,d:'Offline IQ est. 127 · ARC-AGI-3 0.37%'},
+];
+const HUM=[{n:'Human master',x:3,y:3,d:'Top ~0.1% on both · z = 3',k:'exp'},{n:'Average adult',x:0,y:0,d:'z = 0 on both',k:'hum'}];
+const dCv=document.getElementById('dens'), tip=document.getElementById('densTip');
+let dGeom=null;
+function drawDens(){
+  const W=dCv.clientWidth,H=dCv.clientHeight;if(!W||!H)return;const dpr=Math.min(window.devicePixelRatio||1,2);
+  dCv.width=W*dpr;dCv.height=H*dpr;const g=dCv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+  const narrow=W<560, L=narrow?40:58, B=48, TOP=narrow?56:80, RM=narrow?56:80, pw=W-L-RM-8, ph=H-TOP-B-8;
+  const sx=x=>L+(x+4)/8*pw, sy=y=>TOP+ph-(y+4)/8*ph;
+  const font=(w,s,f)=>`${w} ${s}px ${f||'"IBM Plex Sans", system-ui, sans-serif'}`;
+  // grid
+  g.strokeStyle=T.grid;g.lineWidth=1;g.fillStyle=T.ink2;g.font=font(400,11,'"IBM Plex Mono", monospace');
+  for(let v=-4;v<=4;v++){g.beginPath();g.moveTo(sx(v),TOP);g.lineTo(sx(v),TOP+ph);g.moveTo(L,sy(v));g.lineTo(L+pw,sy(v));g.stroke();
+    g.textAlign='center';g.fillText(v,sx(v),TOP+ph+16);g.textAlign='right';g.fillText(v,L-6,sy(v)+4);}
+  // hex bins in pixel space
+  const s=Math.max(5,pw/64), bins=new Map();
+  for(let i=0;i<N;i++){const x=sx(PX[i])-L,y=sy(PY[i])-TOP;if(x<0||y<0||x>pw||y>ph)continue;
+    let q=(Math.sqrt(3)/3*x-y/3)/s,r=(2/3*y)/s,cx=q,cz=r,cy=-q-r,rx=Math.round(cx),ry=Math.round(cy),rz=Math.round(cz);
+    const dx=Math.abs(rx-cx),dy=Math.abs(ry-cy),dz=Math.abs(rz-cz);if(dx>dy&&dx>dz)rx=-ry-rz;else if(dy>dz)ry=-rx-rz;else rz=-rx-ry;
+    const k=rx+','+rz;bins.set(k,(bins.get(k)||0)+1);}
+  let mx=0;bins.forEach(v=>{if(v>mx)mx=v;});
+  const stops=(dark()?['#3a1e12','#8a3614','#e0662f','#f7b08d']:['#fde8dd','#f4a07a','#e0662f','#8f310c']).map(hex2rgb);
+  bins.forEach((v,k)=>{const [q,r]=k.split(',').map(Number);const cx=L+s*Math.sqrt(3)*(q+r/2),cy=TOP+s*1.5*r;const c=ramp(stops,Math.sqrt(v/mx));
+    g.fillStyle=`rgb(${c.map(Math.round).join(',')})`;g.beginPath();for(let a=0;a<6;a++){const ang=Math.PI/180*(60*a-30);const px=cx+(s-0.8)*Math.cos(ang),py=cy+(s-0.8)*Math.sin(ang);a?g.lineTo(px,py):g.moveTo(px,py);}g.closePath();g.fill();});
+  // axes zero lines
+  g.strokeStyle=T.ink3;g.setLineDash([4,4]);g.beginPath();g.moveTo(sx(0),TOP);g.lineTo(sx(0),TOP+ph);g.moveTo(L,sy(0));g.lineTo(L+pw,sy(0));g.stroke();g.setLineDash([]);
+  // marginals
+  const nb=40,hx=new Array(nb).fill(0),hy=new Array(nb).fill(0);
+  for(let i=0;i<N;i++){const bx=Math.floor((PX[i]+4)/8*nb),by=Math.floor((PY[i]+4)/8*nb);if(bx>=0&&bx<nb)hx[bx]++;if(by>=0&&by<nb)hy[by]++;}
+  const hm=Math.max(...hx,...hy),mh=TOP-18,bw=pw/nb,bh=ph/nb;
+  g.fillStyle=T.hum;
+  hx.forEach((v,i)=>{const h=v/hm*mh;g.fillRect(L+i*bw+1,TOP-6-h,bw-2,h);});
+  hy.forEach((v,i)=>{const w=v/hm*(RM-18);g.fillRect(L+pw+6,TOP+ph-(i+1)*bh+1,w,bh-2);});
+  // quadrant labels
+  g.font=font(500,10.5,'"IBM Plex Mono", monospace');g.fillStyle=T.ink3;
+  g.textAlign='left';g.fillText('FAST LEARNER',sx(-3.85),sy(3.7));g.fillText('DEVELOPING',sx(-3.85),sy(-3.8));
+  g.textAlign='right';g.fillText('MASTER ZONE',sx(3.85),sy(3.7));g.fillText('TEST-TAKER CORNER',sx(3.85),sy(-3.8));
+  // markers
+  const pts=[];
+  MODELS.forEach(m=>{const x=sx(m.x),y=sy(m.y);g.beginPath();g.arc(x,y,6.5,0,Math.PI*2);if(m.m){g.fillStyle=T.ai;g.fill();g.lineWidth=2;g.strokeStyle=T.surface;g.stroke();}else{g.lineWidth=2.5;g.strokeStyle=T.ai;g.stroke();}
+    g.font=font(600,11.5);g.fillStyle=T.ink;g.textAlign=x>L+pw-120?'right':'left';g.fillText(m.n,x+(g.textAlign==='right'?-11:11),y+4);pts.push({...m,px:x,py:y});});
+  HUM.forEach(h=>{const x=sx(h.x),y=sy(h.y);g.fillStyle=T[h.k];g.strokeStyle=T.surface;g.lineWidth=2;g.beginPath();
+    if(h.k==='exp'){for(let a=0;a<10;a++){const rr=a%2?5:11,ang=-Math.PI/2+a*Math.PI/5;const px=x+rr*Math.cos(ang),py=y+rr*Math.sin(ang);a?g.lineTo(px,py):g.moveTo(px,py);}}
+    else{g.moveTo(x,y-8);g.lineTo(x+7,y);g.lineTo(x,y+8);g.lineTo(x-7,y);}g.closePath();g.fill();g.stroke();
+    g.font=font(600,11.5);g.fillStyle=T.ink;g.textAlign='right';g.fillText(h.n,x-13,y+(h.k==='exp'?18:4));pts.push({...h,px:x,py:y});});
+  // axis titles
+  g.fillStyle=T.ink2;g.font=font(500,12);g.textAlign='center';
+  g.fillText('Static reasoning · z = (offline IQ − 100) / 15',L+pw/2,H-10);
+  g.save();g.translate(14,TOP+ph/2);g.rotate(-Math.PI/2);g.fillText('Adaptive learning · z = Φ⁻¹(½ · ARC-AGI-3)',0,0);g.restore();
+  dGeom={pts,sx,sy,L,TOP,pw,ph,s,bins};
+}
+dCv.addEventListener('pointermove',e=>{
+  if(!dGeom)return;const r=dCv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  let best=null,bd=16;dGeom.pts.forEach(p=>{const d=Math.hypot(p.px-x,p.py-y);if(d<bd){bd=d;best=p;}});
+  let html='';
+  if(best)html=`<b>${best.n}</b><br>${best.d}<br><span class="mono">z static ${best.x.toFixed(2)} · z adaptive ${best.y.toFixed(2)}</span>`;
+  else if(x>dGeom.L&&x<dGeom.L+dGeom.pw&&y>dGeom.TOP&&y<dGeom.TOP+dGeom.ph){
+    const s=dGeom.s,lx=x-dGeom.L,ly=y-dGeom.TOP;let q=(Math.sqrt(3)/3*lx-ly/3)/s,rr=(2/3*ly)/s,cx=q,cz=rr,cy=-q-rr,rx=Math.round(cx),ry=Math.round(cy),rz=Math.round(cz);
+    const dx=Math.abs(rx-cx),dy=Math.abs(ry-cy),dz=Math.abs(rz-cz);if(dx>dy&&dx>dz)rx=-ry-rz;else if(dy>dz)ry=-rx-rz;else rz=-rx-ry;
+    const v=dGeom.bins.get(rx+','+rz)||0;const zx=(lx/dGeom.pw)*8-4,zy=4-(ly/dGeom.ph)*8;
+    html=`<b>${v} simulated people</b><br><span class="mono">z static ${zx.toFixed(1)} · z adaptive ${zy.toFixed(1)}</span>`;}
+  if(!html){tip.hidden=true;return;}
+  tip.innerHTML=html;tip.hidden=false;const tw=tip.offsetWidth;tip.style.left=Math.min(x+14,r.width-tw-6)+'px';tip.style.top=(y+14)+'px';
+});
+dCv.addEventListener('pointerleave',()=>{tip.hidden=true;});
+try{new ResizeObserver(drawDens).observe(dCv);}catch(_){window.addEventListener('resize',drawDens);}
+
+// ================= 10. IQ* + composites (Chart.js) =================
+const IQS=[{n:'Human master',zs:3,za:3,c:'exp'},{n:'Average adult',zs:0,za:0,c:'hum'},{n:'GPT-6 Astra',zs:zs(130),za:za(62.7),c:'ai'},{n:'Claude Opus 5',zs:zs(129),za:za(30.2),c:'ai'},{n:'GPT-5.6 Sol',zs:zs(130),za:za(7.8),c:'ai'}];
+const tipOpt=()=>({backgroundColor:T.surface,titleColor:T.ink,bodyColor:T.ink2,borderColor:T.line,borderWidth:1,padding:10});
+let iqChart=null, projChart=null;
+const iqVals=()=>{const l=+document.getElementById('lam').value;return IQS.map(p=>100+15*((1-l)*p.zs+l*p.za));};
+function drawIQ(){
+  const l=+document.getElementById('lam').value;document.getElementById('lamOut').textContent=Math.round(l*100)+'% adaptive';
+  if(!window.Chart)return;
+  if(iqChart){iqChart.data.datasets[0].data=iqVals();iqChart.update();return;}
+  iqChart=new Chart(document.getElementById('iqstar'),{type:'bar',data:{labels:IQS.map(p=>p.n),datasets:[{data:iqVals(),backgroundColor:IQS.map(p=>T[p.c]),borderRadius:4,borderSkipped:'start',barPercentage:.7}]},
+    options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:Object.assign(tipOpt(),{callbacks:{label:i=>'IQ* '+i.parsed.x.toFixed(1)}}),refLines:{lines:[{axis:'x',value:100,color:T.ink3,dash:[3,3],label:'100'}]}},
+      scales:{x:{min:40,max:160,grid:{color:T.grid},border:{display:false},ticks:{color:T.ink2}},y:{grid:{display:false},ticks:{color:T.ink,font:{weight:'500'}}}}}});
+}
+function drawComp(){
+  if(!window.IQDATA||!D.length)return;const W=window.IQDATA.getW(),sw=W.reduce((a,b)=>a+b,0)||1;
+  const rows=[['Frontier AI','ai'],['Average adult','avg'],['Top human expert','exp']].map(([n,k])=>[n,D.reduce((s,d,i)=>s+d[k]*W[i],0)/sw,Math.exp(D.reduce((s,d,i)=>s+W[i]/sw*Math.log(Math.max(d[k],1)),0))]);
+  document.getElementById('compTbl').innerHTML='<thead><tr><th>Profile</th><th>I<sub>A</sub> arithmetic</th><th>I<sub>G</sub> bottleneck</th><th>Penalty</th></tr></thead><tbody>'+rows.map(r=>`<tr><td>${r[0]}</td><td class="m">${r[1].toFixed(1)}</td><td class="m">${r[2].toFixed(1)}</td><td class="m">${(r[2]-r[1]).toFixed(1)}</td></tr>`).join('')+'</tbody>';
+}
+
+// ================= 11. Live projection =================
+const yr=ms=>{const d=new Date(ms),y=d.getUTCFullYear();return y+(ms-Date.UTC(y,0,1))/(Date.UTC(y+1,0,1)-Date.UTC(y,0,1));};
+const fmtD=ms=>new Date(ms).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const reach=(h,td)=>T0+Math.log2(h/H0)*td*DAY;
+function tick(){const h=hAt(Date.now()),hh=Math.floor(h),mm=Math.floor((h-hh)*60),ss=Math.floor(((h-hh)*60-mm)*60);document.getElementById('liveH').textContent=hh+' h '+String(mm).padStart(2,'0')+' m '+String(ss).padStart(2,'0')+' s';}
+function fillDates(){[40,167,2000].forEach(h=>{document.getElementById('d'+h).textContent=fmtD(reach(h,TD));document.getElementById('d'+h+'r').textContent='Range '+fmtD(reach(h,100))+' – '+fmtD(reach(h,200));});}
+function drawProj(){
+  if(!window.Chart)return; if(projChart)projChart.destroy();
+  const mid=[],lo=[],hi=[];for(let t=T0;t<=Date.UTC(2029,0,1);t+=14*DAY){const x=yr(t);mid.push({x,y:H0*2**((t-T0)/DAY/131)});lo.push({x,y:H0*2**((t-T0)/DAY/200)});hi.push({x,y:H0*2**((t-T0)/DAY/100)});}
+  const meas=[['Claude 3.7 Sonnet',Date.UTC(2025,1,24),1],['Claude Opus 4.5',Date.UTC(2025,10,24),5],['Claude Opus 4.6',Date.UTC(2026,1,5),12],['Claude Mythos Preview (≥)',Date.UTC(2026,4,8),16]];
+  projChart=new Chart(document.getElementById('proj'),{type:'line',data:{datasets:[
+      {data:hi,borderWidth:0,pointRadius:0,fill:false},
+      {data:lo,borderWidth:0,pointRadius:0,fill:'-1',backgroundColor:T.ai+'2e'},
+      {label:'Projection (131-day doubling)',data:mid,borderColor:T.ai,borderDash:[6,4],borderWidth:2,pointRadius:0},
+      {label:'Measured',data:meas.map(m=>({x:yr(m[1]),y:m[2],n:m[0]})),showLine:false,pointRadius:6,pointBackgroundColor:T.ai,pointBorderColor:T.surface,pointBorderWidth:2}]},
+    options:{maintainAspectRatio:false,parsing:false,interaction:{mode:'nearest',intersect:false},
+      plugins:{legend:{display:false},tooltip:Object.assign(tipOpt(),{filter:i=>i.datasetIndex>=2,callbacks:{title:i=>i[0].raw.n||('Projected · '+i[0].raw.x.toFixed(2)),label:i=>(i.datasetIndex===3?'measured ':'')+(i.raw.y<100?i.raw.y.toFixed(1):Math.round(i.raw.y).toLocaleString())+' h'}}),
+        refLines:{lines:[{axis:'y',value:8,color:T.hum,dash:[4,3],label:'1 workday'},{axis:'y',value:40,color:T.hum,dash:[4,3],label:'1 work-week'},{axis:'y',value:167,color:T.hum,dash:[4,3],label:'1 work-month'},{axis:'y',value:2000,color:T.hum,dash:[4,3],label:"Master's 1-year project"},{axis:'x',value:yr(Date.now()),color:T.ink3,dash:[2,3],label:'now'}]}},
+      scales:{x:{type:'linear',min:2025,max:2029,grid:{color:T.grid},border:{color:T.grid},ticks:{color:T.ink2,stepSize:0.5,callback:v=>Number.isInteger(v)?String(v):'Jul'}},
+        y:{type:'logarithmic',min:0.5,max:20000,grid:{color:T.grid},border:{display:false},title:{display:true,text:'50% time horizon (expert hours)',color:T.ink3},ticks:{color:T.ink2,callback:v=>({1:'1 h',10:'10 h',100:'100 h',1000:'1,000 h',10000:'10,000 h'}[v]||'')}}}}});
+}
+
+// ================= boot =================
+function all(){readT();buildLand();setLandDate(+tDate.value);buildSpace();drawDens();if(iqChart){iqChart.destroy();iqChart=null;}drawIQ();drawComp();drawProj();}
+all();fillDates();tick();setInterval(tick,1000);
+document.getElementById('lam').addEventListener('input',drawIQ);
+document.addEventListener('weights',drawComp);
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',all);}catch(_){}
+new MutationObserver(all).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+})();
+</script>
+<script>
+(function(){const f=document.getElementById('pfilter');if(!f)return;f.addEventListener('click',e=>{const k=e.target.dataset.f;if(!k)return;
+f.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===k));
+document.querySelectorAll('#papers .paper').forEach(c=>{c.hidden=!(k==='all'||c.dataset.g===k);});});})();
+</script>

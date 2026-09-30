@@ -1,0 +1,405 @@
+\documentclass[11pt]{article}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[section]{placeins}
+\definecolor{link}{HTML}{1C5CAB}
+\usepackage[colorlinks=true,linkcolor=link,citecolor=link,urlcolor=link]{hyperref}
+\setlist{nosep,leftmargin=1.4em}
+\titleformat{\section}{\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\pagestyle{fancy}\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize Gondane (2026) \textperiodcentered{} Superhuman Scores, Sub-Human Adaptation}
+\fancyfoot[R]{\footnotesize\thepage}
+\newcommand{\ai}{\textsc{ai}}
+
+\title{\vspace{-1.5em}\textbf{Superhuman Scores, Sub-Human Adaptation:}\\[2pt]
+\large A Multi-Dimensional, Growth-Aware Comparison of Frontier AI Models and Human Intelligence}
+\author{Shreyash Gondane\\ \small Independent Researcher \\ \small\href{mailto:shreyasgondane@gmail.com}{shreyasgondane@gmail.com}}
+\date{\small White paper \textperiodcentered{} Data snapshot 27 September 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+\noindent Headlines now report that frontier AI models have ``genius-level'' IQ. We test how far that claim holds when intelligence is treated as a profile rather than a single number, and when rate of improvement is considered alongside level. We compile a September 2026 snapshot of public leaderboards for the ten leading model families (TrackingAI IQ tests, ARC-AGI-1/2/3, METR task-completion time horizons, Humanity's Last Exam and the Artificial Analysis Intelligence Index) and place them on human psychometric scales grounded in Cattell--Horn--Carroll theory. We introduce five simple instruments: a contamination-aware static z-score, an adaptive z-score derived from the interactive ARC-AGI-3 benchmark, a logistic success model over task novelty and task length, arithmetic versus bottleneck (geometric) composite indices, and a Monte Carlo analysis over weights, scores and growth parameters. Four findings emerge. (1)~On static tests, models exceed nearly all humans: 151, the maximum score on the public Mensa Norway test (at least 1 in 3,000) and 135 on a leak-resistant offline test (top 1\%), with a 15--21 point public-to-offline gap indicating contamination. (2)~On interactive learning of unfamiliar tasks, the best model reaches 62.7\% of human efficiency and the median frontier model 2--30\%, placing models in a region of ability space that almost no human occupies: high static reasoning, below-median adaptation. (3)~The ranking between AI, an average adult and a domain expert reverses depending on the weighting. A Monte Carlo analysis over 200,000 random weightings, with score noise, shows frontier AI ahead of an average adult in 56--59\% of weightings but ahead of a domain expert in only 10--18\%; the weight on speed and scale is the main factor that favours AI, and the weights on continual learning and embodied judgment favour the expert. (4)~Growth rates differ by orders of magnitude: the top AI IQ score rose about 50 points in 30 months against roughly 3 points per decade for the human Flynn effect, and the 50\% time horizon doubles about every 131 days. Simulating the growth parameters puts the median date for a one-work-month horizon in June 2027 (80\% interval March--October 2027). We conclude that ``smarter than humans'' is ill-posed; the defensible statement, robust across weightings, is that current models are at parity with an average adult, below a domain master on novel, long-horizon work, and closing that gap on a timescale of months.
+\end{abstract}
+
+\noindent\textbf{Keywords:} artificial intelligence; psychometrics; Cattell--Horn--Carroll; fluid intelligence; ARC-AGI; time horizon; benchmark contamination; AGI measurement
+
+\section{Introduction}
+Every few months a new model is reported to have a higher IQ than the last. In September 2026 two systems share a score of 151 on the public Mensa Norway matrix test, a level reached by roughly one person in three thousand. Taken at face value, that number implies that frontier models are more intelligent than almost everyone. Yet the same models fail at things most people find easy: learning the rules of an unfamiliar game in a few minutes, remembering what happened last week, or carrying a project reliably over weeks.
+
+The tension is not new. Psychometrics has long distinguished general ability from its components \citep{spearman1904,cattell1963,carroll1993}, and machine-intelligence researchers have argued that skill on a known task is a poor proxy for the ability to acquire new skills \citep{chollet2019,legg2007,hernandez2017}. What has changed is the size of the discrepancy. On static benchmarks models are near saturation; on the newest interactive benchmark they started 2026 below 1\% \citep{arcagi3}. A single scalar cannot represent both facts.
+
+This paper makes three contributions. First, it assembles a dated, sourced snapshot of how the top frontier models score on IQ-style and adaptability benchmarks, with explicit human reference points. Second, it proposes a small set of transparent instruments for placing AI systems on human scales (contamination-aware and adaptive z-scores, a success landscape, and weighted composites) and shows how conclusions depend on the weighting. Third, it quantifies growth velocity, contrasting the months-scale doubling of AI capability with the decades-scale drift of human test performance. An interactive companion reproduces every figure (Data availability).
+
+\section{Background}
+\subsection{Human intelligence as a structured profile}
+Spearman observed that performance on diverse mental tests is positively correlated and proposed a general factor, $g$ \citep{spearman1904}. Cattell separated fluid intelligence, the capacity to solve novel problems, from crystallized intelligence, accumulated knowledge \citep{cattell1963}. Carroll's reanalysis of more than 460 datasets produced the three-stratum model that, merged with Cattell--Horn theory, became the Cattell--Horn--Carroll (CHC) framework, the most widely used structural model of human abilities \citep{carroll1993}. Two further results matter here. Population IQ rose by roughly three points per decade during the twentieth century \citep{flynn1987}, the fastest documented change in human scores. Expert performance, by contrast, comes largely from about a decade of deliberate practice within a domain \citep{ericsson1993}, which is why we distinguish an average adult from a domain master. General mental ability is the single strongest predictor of job performance, but it explains only part of the variance \citep{schmidt1998}.
+
+\subsection{Defining and measuring machine intelligence}
+Legg and Hutter define universal intelligence as expected performance weighted across all computable environments \citep{legg2007}, a formal ancestor of the weighted composites used below. Chollet redefines intelligence as skill-acquisition efficiency relative to priors and experience, and introduced the Abstraction and Reasoning Corpus (ARC) to measure it \citep{chollet2019}. Hern\'andez-Orallo shows why tests calibrated on humans can mislead when applied to machines \citep{hernandez2017}. Lake et al.\ argue that human learning is sample-efficient because it builds compositional, causal models \citep{lake2017}, and catastrophic forgetting remains the central obstacle to continual learning in neural networks \citep{kirkpatrick2017}. Recent frameworks rate systems on performance and generality \citep{morris2023} or score them on the ten CHC domains at equal weight; the latter reports GPT-4 at 27\% and GPT-5 at 57\% of a well-educated adult, with long-term memory storage as the largest deficit \citep{hendrycks2025}.
+
+\subsection{Capability growth and emergent behaviour}
+Language-model loss falls as a power law in parameters, data and compute \citep{kaplan2020,hoffmann2022}; scale also brought in-context few-shot learning \citep{brown2020}. Some capabilities appear to emerge abruptly with scale \citep{wei2022}, although part of that appearance is an artefact of discontinuous metrics \citep{schaeffer2023}, a caution that applies equally to the composite indices here. METR operationalises progress as the length of expert task an agent completes with a given reliability, finding exponential growth in this time horizon \citep{kwa2025}.
+
+\subsection{Human--AI comparisons}
+GPT-3 matched or exceeded people on Raven-style analogy problems without training on them \citep{webb2023}, and early GPT-4 experiments were read by some as sparks of general intelligence \citep{bubeck2023}. A field experiment with 758 consultants found that AI assistance raised quality on tasks inside the model's capability frontier and lowered it outside, a ``jagged frontier'' \citep{dellacqua2023}. Our results quantify that jaggedness across psychometric dimensions.
+
+\section{Data and methods}
+\subsection{Data}
+All figures are a snapshot taken on 27 September 2026 from public sources (Table~\ref{tab:board}). IQ scores come from TrackingAI, which administers the public Mensa Norway test and an offline test written by a Mensa member and never published online \citep{trackingai,binaryverse2026}. ARC-AGI-2 and ARC-AGI-3 scores come from the ARC Prize leaderboard and aggregators that republish it \citep{arcagi2,arcagi3,benchlm2026,llmlearner2026}; for ARC-AGI-3 we use only standard-harness results. Humanity's Last Exam (HLE) \citep{hle2025} and Intelligence Index scores come from Artificial Analysis \citep{aa2026}. Time horizons come from METR \citep{kwa2025,metrth}.
+
+Human reference values are: IQ mean 100 and standard deviation 15; average individual accuracy of 66\% on ARC-AGI-2, where every task was solved by at least two people (a human panel of 100\%) \citep{arcagi2}; and a human baseline of 100\% on ARC-AGI-3, which is defined relative to human action efficiency \citep{arcagi3}.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Frontier model scores, 27 September 2026. Dashes mark no published result under that protocol. HLE = Humanity's Last Exam; AA = Artificial Analysis Intelligence Index v4.3.}
+\label{tab:board}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Model & Mensa Norway & Offline IQ & ARC-AGI-2 & ARC-AGI-3 & HLE & AA \\
+\midrule
+Claude Opus 5.5 & -- & -- & 93.3\% & -- & 61.4\% & 58 \\
+Claude Fable 5.1 & 151 & 130 & 90.0\% & -- & 59.1\% & 53 \\
+GPT-6 Astra & 151\textsuperscript{v} & 130 & 95.0\% & 62.7\% & -- & 52.7 \\
+GPT-5.6 Sol & 145 & 130 & 92.5\% & 7.8\% & -- & -- \\
+Claude Opus 5 & 144 & 129 & 90.4\% & 30.2\% & 54.9\% & -- \\
+Claude Fable 5 & -- & -- & 89.2\% & -- & 55.5\% & -- \\
+GPT-5.6 Terra & -- & 135\textsuperscript{v} & -- & -- & -- & -- \\
+Gemini 3.8 Flash & -- & -- & 89.2\% & 10.4\% & -- & -- \\
+Gemini 3.1 Pro & 145 & -- & 77.1\%\textsuperscript{a} & 0.37\%\textsuperscript{b} & -- & -- \\
+Grok 4.6 / 4.20 & 145\textsuperscript{c} & -- & 67.1\% & 2.1\% & -- & -- \\
+\midrule
+Average adult & 100 & 100 & 66\% & -- & -- & -- \\
+Human panel / baseline & -- & -- & 100\% & 100\% & -- & -- \\
+\bottomrule
+\end{tabular}\\[3pt]
+\footnotesize \textsuperscript{v}Vision variant. \textsuperscript{a}February 2026. \textsuperscript{b}March 2026. \textsuperscript{c}Grok-4.20, April 2026.
+\end{table}
+
+\subsection{Placing models on human scales}
+A static z-score uses offline IQ where available, because public test items are likely present in training data:
+\begin{equation}
+z_s=\frac{IQ_{\text{off}}-100}{15}.
+\end{equation}
+Where only a public score exists we estimate $IQ_{\text{off}}\approx IQ_{\text{Mensa}}-18$, the mean public-to-offline gap among models with both scores; such points are flagged as estimates. An adaptive z-score maps an ARC-AGI-3 score $S\in[0,100]$ onto the human distribution under the assumption that the 100\% baseline corresponds to the human median:
+\begin{equation}
+z_a=\Phi^{-1}\!\left(\tfrac{1}{2}\,S/100\right),
+\end{equation}
+where $\Phi^{-1}$ is the standard normal quantile. A simulated human population of 20,000 draws $(z_s,z_a)$ from a bivariate normal with correlation $0.6$, reflecting the positive manifold \citep{spearman1904}; a human master is placed at $z=3$ on both axes (about the top 0.1\%). Combining the two gives an adaptability-adjusted IQ,
+\begin{equation}
+IQ^{*}(\lambda)=100+15\big[(1-\lambda)\,z_s+\lambda\,z_a\big],
+\end{equation}
+where $\lambda\in[0,1]$ is the weight placed on learning new tasks.
+
+\subsection{Success landscape}
+Following METR's logistic fit in log task length \citep{kwa2025}, we model the probability of completing a task of expert duration $h$ and novelty $n\in[0,1]$ as
+\begin{equation}
+P(n,h)=\sigma\!\left(k\log_2\frac{H_{50}}{h}-\beta\,(n-n_0)\right),\qquad n_0=0.2.
+\end{equation}
+For frontier AI, $k=0.574$ reproduces METR's reported 50\% horizon of about 16~h and 80\% horizon of about 3~h ($k=\ln 4/\log_2(16/3)$), and $\beta=6.0$ reproduces roughly 30\% success on eight-minute fully novel tasks, the median of ARC-AGI-3 leaders. For a human master we assume $H_{50}=2{,}000$~h (about one working year), $k=0.5$ and $\beta=1.5$. These human parameters are assumptions, not measurements.
+
+\subsection{Growth model}
+The AI horizon grows as
+\begin{equation}
+H_{50}(t)=H_0\cdot 2^{(t-t_0)/T_d},
+\end{equation}
+with $H_0=16$~h at $t_0=$ 8 May 2026 (Claude Mythos Preview, a lower bound) and $T_d=131$ days, METR's post-2023 doubling time \citep{metrth}. We report a sensitivity band for $T_d\in[100,200]$ days.
+
+\subsection{Cognitive profile and weighted composites}
+We score nine dimensions on 0--100 for three reference profiles: frontier AI (best of the top ten), an average adult, and a top expert in their own field (Table~\ref{tab:profile}). Dimensions follow CHC broad abilities where possible and add dimensions that matter for deployed agents. Scores are anchored to a benchmark where one exists; for continual learning and embodied or social judgment they are informed judgments. For weights $w_i$ and scores $s_i$ we compute an arithmetic index and a geometric (bottleneck) index:
+\begin{equation}
+I_A=\frac{\sum_i w_i s_i}{\sum_i w_i},\qquad I_G=\prod_i s_i^{\,w_i/\sum_j w_j}.
+\end{equation}
+$I_A$ lets a strength offset a weakness; $I_G$ penalises the weakest dimension, closer to how a missing ability limits real work. Four weightings are compared: IQ-test (knowledge and static reasoning), Adaptability (after Chollet \citep{chollet2019}), Economic work (autonomy, reliability, speed, judgment, after Schmidt and Hunter and Dell'Acqua et al.\ \citep{schmidt1998,dellacqua2023}) and Balanced (equal weights, as in Hendrycks et al.\ \citep{hendrycks2025}).
+
+\begin{table}[htbp]
+\centering\small
+\caption{Nine-dimension cognitive profile (0--100) and anchoring evidence.}
+\label{tab:profile}
+\begin{tabular}{@{}lrrrp{6.1cm}@{}}
+\toprule
+Dimension & AI & Avg. & Expert & Anchor \\
+\midrule
+Knowledge breadth & 97 & 45 & 70 & HLE 61\% across 100+ fields \\
+Static abstract reasoning & 92 & 50 & 95 & ARC-AGI-2 95\% vs 66\%; offline IQ 135 \\
+Expert problem solving & 88 & 20 & 95 & Competition maths, PhD-level science Q\&A \\
+Novel interactive learning & 60 & 85 & 100 & ARC-AGI-3 best 62.7\% of human efficiency \\
+Long-horizon autonomy & 45 & 65 & 95 & METR: 16~h at 50\%, 3~h at 80\% \\
+Sample efficiency & 30 & 75 & 90 & Few-shot concept learning \citep{lake2017} \\
+Continual learning \& memory & 15 & 80 & 90 & No weight updates in deployment \citep{kirkpatrick2017,hendrycks2025}; judgment \\
+Speed \& scale & 99 & 5 & 10 & Throughput, parallel copies \\
+Embodied \& social judgment & 20 & 85 & 90 & Judgment; little benchmark coverage \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Monte Carlo uncertainty and sensitivity analysis}
+Fixed weightings invite the objection that the author chose them. Following standard practice for composite indicators \citep{saisana2005,saltelli2008}, we treat the weights as uncertain. We draw $N=200{,}000$ weight vectors from a symmetric Dirichlet distribution, $\mathbf{w}\sim\mathrm{Dir}(\alpha\mathbf{1}_9)$, with $\alpha\in\{0.5,1,5\}$ ($\alpha=1$ is uniform over all weightings; larger $\alpha$ concentrates near equal weights). To reflect uncertainty in the profile itself, we add independent Gaussian noise with standard deviation 10 points to every score, clipped to $[1,100]$. For each draw we compute $I_A$ and $I_G$ and record which profile ranks first. The quantity of interest is the rank probability
+\begin{equation}
+\pi_{\text{AI}>X}=\Pr_{\mathbf{w},\varepsilon}\big[I(\mathbf{w},\mathbf{s}_{\text{AI}}+\varepsilon)>I(\mathbf{w},\mathbf{s}_X+\varepsilon)\big].
+\end{equation}
+To identify which weights drive the result, we regress the standardised AI--expert gap on the standardised weights and report the standardised regression coefficients. For growth, we draw $T_d$ from a log-normal distribution centred on 131 days (80\% interval 104--165 days) and $H_0$ uniformly from 16--24~h, since 16~h is a lower bound, and report the distribution of dates at which each human work duration is reached.
+
+\section{Results}
+\subsection{IQ-style tests}
+On the public Mensa Norway test the highest scores are 151 (Claude Fable 5.1 and GPT-6 Astra, vision), followed by a cluster at 142--145 (Figure~\ref{fig:iq}). Fifteen models score 140 or higher. A score of 151 means all 35 items answered correctly, the test's maximum, so under a normal distribution it corresponds to at least 1 in 2,970 people; 145 corresponds to 1 in 741 (Figure~\ref{fig:bell}). Offline scores are lower: the best is 135 (GPT-5.6 Terra, vision), about 1 in 100, against an offline maximum of about 136. Both tests are therefore near saturation for the leading models. For models tested both ways the gap ranges from 2 points (GPT-5.6 Sol Ultra, vision) to 21 points (Claude Fable 5.1). The top public score rose from about 101 in March 2024 to 151 in September 2026.
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=.86\linewidth]{fig/f1_bell.pdf}
+\caption{Human IQ distribution with the top AI scores on the public (151) and offline (135) tests.}
+\label{fig:bell}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=.86\linewidth]{fig/f2_iq.pdf}
+\caption{Public and offline IQ for the top ten model variants. The public-to-offline gap indicates how much of the public score reflects memorised items.}
+\label{fig:iq}
+\end{figure}
+
+\subsection{Static versus interactive reasoning}
+Within one puzzle family the picture reverses as the task shifts from recognising a pattern to learning an environment (Figure~\ref{fig:arc}). The best model scores 98.5\% on ARC-AGI-1 and 95.0\% on ARC-AGI-2, well above the 66\% an average individual scores on ARC-AGI-2. On ARC-AGI-3 every frontier model scored below 1\% at launch in March 2026; by September the leader reached 62.7\% and the second 30.2\%, still below the human baseline. Mapped to human scales (Figure~\ref{fig:dens}), measured models sit at $z_s\approx 2$ but $z_a$ between $-1.0$ and $-1.8$: a ``test-taker corner'' ($z_s\ge1.8$, $z_a\le-1$) that one simulated person in 20,000 occupies.
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=\linewidth]{fig/f3_arc.pdf}
+\caption{(a) Best AI versus human reference on three generations of ARC. (b) ARC-AGI-3 frontier over 2026 (standard harness).}
+\label{fig:arc}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=.8\linewidth]{fig/f7_density.pdf}
+\caption{Simulated human population (20,000 draws, $\rho=0.6$) on static and adaptive z-scores, with marginal histograms. Filled markers are measured; hollow markers use an estimated offline IQ.}
+\label{fig:dens}
+\end{figure}
+
+\subsection{Profile and weighting sensitivity}
+The profile is sharply jagged (Figure~\ref{fig:radar}). Frontier AI leads on knowledge breadth, speed and static reasoning, while scoring lowest of the three profiles on novel learning, sample efficiency, continual learning and embodied judgment. Table~\ref{tab:comp} and Figure~\ref{fig:weights} show that the ranking depends on the weighting. Under IQ-test weights AI scores 90.1 against 83.9 for an expert and 39.6 for an average adult. Under adaptability weights AI falls to 44.6, below the average adult (72.8). Under a bottleneck index with balanced weights AI loses 10.9 points and the expert 11.1, so the geometric penalty does not single out AI; it shifts where each profile's weakness lies.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Composite scores by weighting. $I_A$ arithmetic, $I_G$ bottleneck (geometric).}
+\label{tab:comp}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+& \multicolumn{2}{c}{Frontier AI} & \multicolumn{2}{c}{Average adult} & \multicolumn{2}{c}{Top expert} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(l){6-7}
+Weighting & $I_A$ & $I_G$ & $I_A$ & $I_G$ & $I_A$ & $I_G$ \\
+\midrule
+IQ-test & \textbf{90.1} & \textbf{89.6} & 39.6 & 33.2 & 83.9 & 76.0 \\
+Adaptability (Chollet) & 44.6 & 37.4 & 72.8 & 69.9 & \textbf{93.8} & \textbf{93.7} \\
+Economic work & 60.9 & 50.2 & 53.9 & 39.9 & \textbf{78.5} & \textbf{65.0} \\
+Balanced (CHC-style) & 60.7 & 49.8 & 56.7 & 44.1 & \textbf{81.7} & \textbf{70.6} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=.62\linewidth]{fig/f4_radar.pdf}
+\caption{Nine-dimension profiles for frontier AI, an average adult and a top expert. Scores are an editorial index anchored to benchmarks where available (Table~\ref{tab:profile}).}
+\label{fig:radar}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=\linewidth]{fig/f5_weights.pdf}
+\caption{Composite scores under four weightings, (a) arithmetic and (b) bottleneck.}
+\label{fig:weights}
+\end{figure}
+
+The adaptability-adjusted IQ makes the same point on a familiar scale (Table~\ref{tab:iqstar}, Figure~\ref{fig:iqstar}). At $\lambda=0$ the measured models score 129--130; at $\lambda=0.5$ they fall to 102--111; at $\lambda=1$ they score 74--93, below the human mean. A human master stays at 145 for every $\lambda$.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Adaptability-adjusted IQ, $IQ^*(\lambda)$.}
+\label{tab:iqstar}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Profile & $z_s$ & $z_a$ & $\lambda=0$ & $0.25$ & $0.5$ & $1$ \\
+\midrule
+Human master & 3.00 & 3.00 & 145 & 145 & 145 & 145 \\
+GPT-6 Astra & 2.00 & $-0.49$ & 130 & 121 & 111 & 93 \\
+Claude Opus 5 & 1.93 & $-1.03$ & 129 & 118 & 107 & 85 \\
+GPT-5.6 Sol & 2.00 & $-1.76$ & 130 & 116 & 102 & 74 \\
+Average adult & 0 & 0 & 100 & 100 & 100 & 100 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=.78\linewidth]{fig/f9_iqstar.pdf}
+\caption{$IQ^*$ as a function of the weight on adaptive learning.}
+\label{fig:iqstar}
+\end{figure}
+
+\subsection{Success landscape}
+Figure~\ref{fig:land} shows the modelled probability of success across task novelty and length. On short, familiar tasks AI and a human master both succeed almost always. The master leads by more than 25 percentage points on 64\% of the task space in September 2026. Holding novelty handling fixed and growing only the horizon, that share falls to 45\% by September 2027 and 24\% by September 2028. The remaining gap sits in the novel, long-duration corner.
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=.8\linewidth]{fig/f6_landscape.pdf}
+\caption{Modelled probability of success by task novelty and expert task length. Lines mark each profile's 50\% frontier.}
+\label{fig:land}
+\end{figure}
+
+\subsection{Growth velocity}
+The METR 50\% horizon rose from seconds (GPT-2, 2019) to at least 16~h (May 2026), roughly one doubling every 131 days since 2023 (Figure~\ref{fig:metr}). Extrapolation gives the dates in Table~\ref{tab:proj}. For comparison, the Flynn effect corresponds to about 0.3 IQ points per year \citep{flynn1987}, while the top AI public IQ score rose by about 20 points per year between 2024 and 2026, and ARC-AGI-3 rose from 0.37\% to 62.7\% in six months.
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=.9\linewidth]{fig/f8_metr.pdf}
+\caption{METR 50\% time horizon (log scale) with projection and a 100--200 day doubling band, against human work durations.}
+\label{fig:metr}
+\end{figure}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Projected dates at which the AI 50\% horizon reaches human work durations, if the 2023--26 trend holds.}
+\label{tab:proj}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Threshold & $T_d=100$ d & $T_d=131$ d & $T_d=200$ d \\
+\midrule
+1 work-week (40 h) & Sep 2026 & Oct 2026 & Jan 2027 \\
+1 work-month (167 h) & Apr 2027 & Jul 2027 & Mar 2028 \\
+Master's 1-year project (2,000 h) & Apr 2028 & Nov 2028 & Mar 2030 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Monte Carlo results}
+Across random weightings the comparison is stable in direction but not in magnitude (Table~\ref{tab:mc}, Figure~\ref{fig:mc}). With uniform weights ($\alpha=1$) and no score noise, frontier AI beats an average adult in 57\% of weightings and a top expert in 10\% ($I_A$); under the bottleneck index these are 59\% and 16\%. Adding score noise changes these by at most two points. The median AI--expert gap is $-22$ points (80\% interval $-40$ to $0$). Concentrating the weights near equality ($\alpha=5$) makes the expert's lead almost certain (97--99.5\%). The sensitivity analysis shows that the weight on speed and scale is by far the largest factor favouring AI (coefficient $+0.68$), followed by knowledge breadth ($+0.30$); the weights on continual learning ($-0.34$), embodied and social judgment ($-0.31$) and sample efficiency ($-0.24$) favour the expert. In other words, AI wins a comparison mainly when the weighting rewards throughput.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Monte Carlo rank probabilities over 200,000 random weightings. Noise = SD of Gaussian perturbation added to each profile score.}
+\label{tab:mc}
+\begin{tabular}{@{}lllrrr@{}}
+\toprule
+Dirichlet $\alpha$ & Noise & Index & AI $>$ average & AI $>$ expert & Expert ranks first \\
+\midrule
+0.5 & 0 & $I_A$ / $I_G$ & 55\% / 55\% & 16\% / 20\% & 84\% / 80\% \\
+1 & 0 & $I_A$ / $I_G$ & 57\% / 59\% & 10\% / 16\% & 90\% / 84\% \\
+1 & 10 & $I_A$ / $I_G$ & 56\% / 56\% & 11\% / 18\% & 89\% / 81\% \\
+5 & 0 & $I_A$ / $I_G$ & 68\% / 71\% & 0.5\% / 3\% & 99.5\% / 97\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=\linewidth]{fig/f10_mc_weights.pdf}
+\caption{(a) Distribution of composite differences across 200,000 uniform random weightings ($I_A$). (b) Standardised regression coefficients of the AI--expert gap on each dimension's weight.}
+\label{fig:mc}
+\end{figure}
+
+Simulating the growth parameters gives a median date of September 2026 for a one-work-week horizon (80\% interval August--November 2026), June 2027 for one work-month (March--October 2027) and September 2028 for a master's one-year project (March 2028--May 2029) (Figure~\ref{fig:mcg}). Propagated into the success landscape, the share of task space where a master leads by more than 25 points falls to a median of 43\% by September 2027 (80\% interval 35--49\%) and 22\% by September 2028 (10--32\%).
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=.9\linewidth]{fig/f11_mc_growth.pdf}
+\caption{Simulated dates at which the AI 50\% horizon reaches human work durations. Bars under each distribution mark the 80\% interval; dots mark the median.}
+\label{fig:mcg}
+\end{figure}
+
+\section{Discussion}
+\paragraph{``Smarter than humans'' is ill-posed.} A model with IQ 151 and an adaptive z-score of $-1.8$ is not more or less intelligent than a person with IQ 115 and an adaptive z-score of $+1$; they have different shapes. Scalar comparisons implicitly choose a weighting, and Table~\ref{tab:comp} shows that reasonable weightings reverse the order. Reporting a profile together with the weighting is more informative than reporting a number.
+
+\paragraph{The gap is in learning, not knowing.} The dimensions where AI trails, namely interactive learning, sample efficiency, continual learning and long-horizon reliability, are the ones that psychometrics labels fluid and that Chollet \citep{chollet2019} labels intelligence proper. Knowledge and pattern completion, where AI leads, are closer to crystallized ability. This matches the CHC-based finding that long-term memory storage is the largest deficit \citep{hendrycks2025}.
+
+\paragraph{Implications for work.} In practice the profile suggests a division of labour. AI is already superhuman on well-specified, knowledge-heavy subtasks. A human master remains necessary for setting goals, handling genuinely new situations, maintaining context across weeks and making judgment calls, consistent with the jagged-frontier field evidence \citep{dellacqua2023}. The success landscape indicates that this boundary moves outward each quarter.
+
+\paragraph{Implications for frontier labs.} For developers such as Anthropic, OpenAI and xAI, the Monte Carlo result suggests a reporting practice: publish a capability profile and the probability of ranking above a human reference across a distribution of weightings, rather than a single score. The sensitivity coefficients also say where progress would change the comparison most. Gains in speed or knowledge barely move a model against a domain expert; gains in continual learning, sample efficiency and long-horizon reliability would.
+
+\paragraph{High-stakes, novel environments.} Space exploration is an extreme case of the regime where the master still leads. Communication delays of minutes to hours force autonomy over long horizons, and the environment is by definition novel. The profile here implies that near-term missions will benefit most from human--AI teaming: AI for throughput, knowledge retrieval and routine operations, humans or human-supervised agents for goal-setting and unanticipated situations. The growth simulation suggests that the length of task an agent can own will expand roughly tenfold every 14--15 months if current trends hold, which should inform how much autonomy mission planners budget for.
+
+\paragraph{Measurement lessons.} Three practices would improve comparisons: prefer leak-resistant or held-out tests to public ones; report the harness and reasoning effort alongside every score, since provider-built harnesses move ARC-AGI-3 from 62.7\% to 99.95\% for GPT-6 and from 10.4\% to 35\% for Gemini 3.8 Flash on ARC Prize's own results page; and report reliability at more than one threshold, because the 80\% horizon is about five times shorter than the 50\% horizon.
+
+\section{Limitations}
+The profile scores and the human-master parameters are the author's estimates, anchored to benchmarks where possible. The ARC-AGI-3 mapping assumes the human baseline equals the human median. Offline IQ for two models is estimated from public scores. Several leaderboard values are vendor or aggregator reports rather than independent runs, and evaluation protocols (tools, effort, vision versus text) differ across rows. METR notes that its task suite is unreliable above about 16~h, so the current horizon is a lower bound and extrapolations are conditional on a trend that may bend \citep{metrth}. IQ norms are population-specific, and none of the instruments measures motivation, values or embodiment directly. The Monte Carlo analysis quantifies uncertainty in the weights and scores but not in the choice of dimensions themselves. Results describe a single snapshot and will date quickly.
+
+\section{Conclusion}
+Frontier AI models in September 2026 are superhuman on static reasoning and knowledge (public IQ 151, offline 135, ARC-AGI-2 95\%) and below a human master on learning unfamiliar tasks and sustaining long work (ARC-AGI-3 at most 62.7\%; a 50\% horizon of about 16~h against months for an expert). A Monte Carlo analysis over 200,000 weightings removes the dependence on any one choice of weights: frontier AI is at rough parity with an average adult (ahead in 56--59\% of weightings) and behind a domain expert in 82--90\% of weightings, and it wins mainly when the weighting rewards speed and scale. What does not depend on weighting is velocity. Simulated growth puts a one-work-month task horizon in mid-2027 and a master's year-long project in late 2028, with the task space where a master clearly leads shrinking from 64\% today to about 22\% by September 2028. The most useful framing is therefore a moving boundary: AI already covers well-specified, high-throughput work, the human master's domain is contracting toward novel and long-horizon problems, and the rate of that contraction is now measurable.
+
+\appendix
+\section{Data provenance}
+Every figure was re-checked against its source on 29 September 2026; the full 28-row ledger is distributed with this paper as \texttt{evidence.csv}. Of the 28 entries, 10 were read on the benchmark owner's page or a peer-reviewed paper, 7 on a secondary page reporting the tracker's figures (TrackingAI's own table loads by script and could not be read automatically), 3 on aggregators, 3 only in search results, 3 are author estimates, 1 is a calculation and 1 (the ARC-AGI-1 human averages) could not be verified and was removed from the analysis.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Provenance of the principal figures.}
+\begin{tabular}{@{}p{4.6cm}p{3.5cm}p{3.1cm}p{3.2cm}@{}}
+\toprule
+Claim & Value & Evidence & Source \\
+\midrule
+Top Mensa Norway score & 151 (test maximum) & Secondary, citing tracker & 36Kr; KuCoin \\
+Top offline IQ & 135 (maximum $\approx$136) & Secondary, citing tracker & 36Kr; KuCoin \\
+Offline IQ, Fable 5.1 / GPT-6 Astra & 130 / 130 & Secondary, citing tracker & KuCoin \\
+Other offline IQ (Opus 5, Sol Ultra) & 129; 130; 131 & Search result only & BinaryVerse \\
+ARC-AGI-1/2 model scores & Table 1 & Primary & \href{https://arcprize.org/results}{ARC Prize results} \\
+ARC-AGI-2 average human & 66\% & Aggregator & BenchLM \\
+ARC-AGI-3, standard harness & 62.7; 30.2; 10.4; 7.8; 2.1 & Aggregator of ARC Prize data; three values primary & LLMLearner; ARC Prize \\
+HLE, top two & 61.4\%; 59.1\% & Primary & Artificial Analysis \\
+Intelligence Index v4.3 & 58; 53; 52.7 & Search result only & Artificial Analysis; modelgrep \\
+METR horizons & 16~h (50\%); 3~h 6~m (80\%) & Secondary table citing METR & Wikipedia; METR \\
+Doubling time & 131 days & Primary & METR blog \\
+Profile scores; master parameters & Tables 2; \S3.4 & Author estimate & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Corrections made during the check: Claude Opus 5.5's ARC-AGI-2 score is 93.3\% on the official results page (an aggregator listed 91.7\%); GPT-6 Astra's offline IQ is a measured 130 (previously estimated at 133); 151 is the ceiling of the public test, so it is reported as a lower bound; the ARC-AGI-1 human averages were removed.
+
+\section*{Disclosure of AI assistance}
+Data compilation, analysis code, figures and drafting were carried out with the assistance of Anthropic's Claude (model identifier \texttt{claude-opus-5-5}). The author directed the study, reviewed the sources and is responsible for the content. Claude Opus 5.5 and other Anthropic models appear in the results; all rankings are taken from third-party leaderboards.
+
+\section*{Data availability}
+All inputs are listed in Table~\ref{tab:board}, with provenance in Appendix~A and the file \texttt{evidence.csv}. An interactive companion reproducing every figure, including rotatable 3D views and adjustable weights, is available at \url{https://claude.ai/artifact/5ukUJpsoqppaka2aM7BVtD}.
+
+\small
+\begin{thebibliography}{99}\setlength{\itemsep}{1pt}
+\bibitem{saisana2005} M.~Saisana, A.~Saltelli, and S.~Tarantola. Uncertainty and sensitivity analysis techniques as tools for the quality assessment of composite indicators. \emph{Journal of the Royal Statistical Society: Series A}, 168(2):307--323, 2005. \href{https://doi.org/10.1111/j.1467-985X.2005.00350.x}{doi:10.1111/j.1467-985X.2005.00350.x}.
+\bibitem{saltelli2008} A.~Saltelli et al. \emph{Global Sensitivity Analysis: The Primer}. Wiley, 2008. \href{https://doi.org/10.1002/9780470725184}{doi:10.1002/9780470725184}.
+\bibitem{spearman1904} C.~Spearman. ``General intelligence,'' objectively determined and measured. \emph{American Journal of Psychology}, 15(2):201--292, 1904. \href{https://doi.org/10.2307/1412107}{doi:10.2307/1412107}.
+\bibitem{cattell1963} R.~B. Cattell. Theory of fluid and crystallized intelligence: a critical experiment. \emph{Journal of Educational Psychology}, 54(1):1--22, 1963. \href{https://doi.org/10.1037/h0046743}{doi:10.1037/h0046743}.
+\bibitem{carroll1993} J.~B. Carroll. \emph{Human Cognitive Abilities: A Survey of Factor-Analytic Studies}. Cambridge University Press, 1993. \href{https://doi.org/10.1017/CBO9780511571312}{doi:10.1017/CBO9780511571312}.
+\bibitem{flynn1987} J.~R. Flynn. Massive IQ gains in 14 nations: what IQ tests really measure. \emph{Psychological Bulletin}, 101(2):171--191, 1987. \href{https://doi.org/10.1037/0033-2909.101.2.171}{doi:10.1037/0033-2909.101.2.171}.
+\bibitem{ericsson1993} K.~A. Ericsson, R.~T. Krampe, and C.~Tesch-R\"omer. The role of deliberate practice in the acquisition of expert performance. \emph{Psychological Review}, 100(3):363--406, 1993. \href{https://doi.org/10.1037/0033-295X.100.3.363}{doi:10.1037/0033-295X.100.3.363}.
+\bibitem{schmidt1998} F.~L. Schmidt and J.~E. Hunter. The validity and utility of selection methods in personnel psychology. \emph{Psychological Bulletin}, 124(2):262--274, 1998. \href{https://doi.org/10.1037/0033-2909.124.2.262}{doi:10.1037/0033-2909.124.2.262}.
+\bibitem{legg2007} S.~Legg and M.~Hutter. Universal intelligence: a definition of machine intelligence. \emph{Minds and Machines}, 17(4):391--444, 2007. \href{https://doi.org/10.1007/s11023-007-9079-x}{doi:10.1007/s11023-007-9079-x}.
+\bibitem{hernandez2017} J.~Hern\'andez-Orallo. \emph{The Measure of All Minds}. Cambridge University Press, 2017. \href{https://doi.org/10.1017/9781316594179}{doi:10.1017/9781316594179}.
+\bibitem{lake2017} B.~M. Lake, T.~D. Ullman, J.~B. Tenenbaum, and S.~J. Gershman. Building machines that learn and think like people. \emph{Behavioral and Brain Sciences}, 40:e253, 2017. \href{https://doi.org/10.1017/S0140525X16001837}{doi:10.1017/S0140525X16001837}.
+\bibitem{kirkpatrick2017} J.~Kirkpatrick et al. Overcoming catastrophic forgetting in neural networks. \emph{PNAS}, 114(13):3521--3526, 2017. \href{https://doi.org/10.1073/pnas.1611835114}{doi:10.1073/pnas.1611835114}.
+\bibitem{chollet2019} F.~Chollet. On the measure of intelligence. arXiv:1911.01547, 2019. \url{https://arxiv.org/abs/1911.01547}.
+\bibitem{morris2023} M.~R. Morris et al. Levels of AGI for operationalizing progress on the path to AGI. arXiv:2311.02462, 2023. \url{https://arxiv.org/abs/2311.02462}.
+\bibitem{hendrycks2025} D.~Hendrycks, D.~Song, C.~Szegedy, H.~Lee, Y.~Gal, et al. A definition of AGI. arXiv:2510.18212, 2025. \url{https://arxiv.org/abs/2510.18212}.
+\bibitem{kaplan2020} J.~Kaplan et al. Scaling laws for neural language models. arXiv:2001.08361, 2020. \url{https://arxiv.org/abs/2001.08361}.
+\bibitem{brown2020} T.~B. Brown et al. Language models are few-shot learners. In \emph{NeurIPS}, 2020. \url{https://arxiv.org/abs/2005.14165}.
+\bibitem{hoffmann2022} J.~Hoffmann et al. Training compute-optimal large language models. In \emph{NeurIPS}, 2022. \url{https://arxiv.org/abs/2203.15556}.
+\bibitem{wei2022} J.~Wei et al. Emergent abilities of large language models. \emph{Transactions on Machine Learning Research}, 2022. \url{https://arxiv.org/abs/2206.07682}.
+\bibitem{schaeffer2023} R.~Schaeffer, B.~Miranda, and S.~Koyejo. Are emergent abilities of large language models a mirage? In \emph{NeurIPS}, 2023. \url{https://arxiv.org/abs/2304.15004}.
+\bibitem{kwa2025} T.~Kwa et al. Measuring AI ability to complete long tasks. arXiv:2503.14499, 2025. \url{https://arxiv.org/abs/2503.14499}.
+\bibitem{metrth} METR. Task-completion time horizons of frontier AI models; Time Horizon 1.1, 2026. \url{https://metr.org/time-horizons/}.
+\bibitem{webb2023} T.~Webb, K.~J. Holyoak, and H.~Lu. Emergent analogical reasoning in large language models. \emph{Nature Human Behaviour}, 7:1526--1541, 2023. \href{https://doi.org/10.1038/s41562-023-01659-w}{doi:10.1038/s41562-023-01659-w}.
+\bibitem{bubeck2023} S.~Bubeck et al. Sparks of artificial general intelligence: early experiments with GPT-4. arXiv:2303.12712, 2023. \url{https://arxiv.org/abs/2303.12712}.
+\bibitem{dellacqua2023} F.~Dell'Acqua et al. Navigating the jagged technological frontier. Harvard Business School Working Paper 24-013, 2023. \href{https://doi.org/10.2139/ssrn.4573321}{doi:10.2139/ssrn.4573321}.
+\bibitem{hle2025} L.~Phan et al. Humanity's Last Exam. arXiv:2501.14249, 2025. \url{https://arxiv.org/abs/2501.14249}.
+\bibitem{arcagi2} F.~Chollet et al. ARC-AGI-2: a new challenge for frontier AI reasoning systems. arXiv:2505.11831, 2025. \url{https://arxiv.org/abs/2505.11831}.
+\bibitem{arcagi3} ARC Prize Foundation. ARC-AGI-3: a new challenge for frontier agentic intelligence. arXiv:2603.24621, 2026. \url{https://arxiv.org/abs/2603.24621}.
+\bibitem{trackingai} M.~Lott. TrackingAI: IQ test results for AI models, 2026. \url{https://trackingai.org/IQ}.
+\bibitem{binaryverse2026} BinaryVerse AI. AI IQ test, September 2026 snapshot. \url{https://binaryverseai.com/ai-iq-test-2025/}.
+\bibitem{benchlm2026} BenchLM. ARC-AGI-2 and ARC-AGI-3 leaderboards, September 2026. \url{https://benchlm.ai/benchmarks/arc-agi-2}.
+\bibitem{llmlearner2026} LLMLearner. ARC-AGI-3 leaderboard (ARC Prize data, read 25 September 2026). \url{https://llmlearner.com/rankings/arc-agi-3}.
+\bibitem{aa2026} Artificial Analysis. Humanity's Last Exam and Intelligence Index v4.3, September 2026. \url{https://artificialanalysis.ai/evaluations/humanitys-last-exam}.
+\end{thebibliography}
+\end{document}
