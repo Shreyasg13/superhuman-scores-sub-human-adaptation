@@ -5,3 +5,6 @@ code/*.npy
 code/mc.json
 results_*.txt
 .DS_Store
+extras/agentic-scaling-mc/*.npz
+extras/agentic-scaling-mc/*.npy
+extras/agentic-scaling-mc/*.png
