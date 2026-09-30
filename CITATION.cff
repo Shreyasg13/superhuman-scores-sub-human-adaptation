@@ -6,6 +6,7 @@ authors:
     given-names: Shreyash
     affiliation: Independent Researcher
 type: software
+doi: "10.5281/zenodo.23050144"
 version: "1.0.0"
 date-released: "2026-09-29"
 license: MIT

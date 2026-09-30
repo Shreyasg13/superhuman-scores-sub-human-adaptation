@@ -1,6 +1,6 @@
 # Replication package
 
-[![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE) [![License: CC BY 4.0](https://img.shields.io/badge/paper%20%26%20data-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE) [![License: CC BY 4.0](https://img.shields.io/badge/paper%20%26%20data-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23050144.svg)](https://doi.org/10.5281/zenodo.23050144)
 
 **Superhuman Scores, Sub-Human Adaptation: A Multi-Dimensional, Growth-Aware Comparison of Frontier AI Models and Human Intelligence**
 Shreyash Gondane, Independent Researcher (2026). Data snapshot 27 September 2026, re-verified 29 September 2026.
@@ -45,4 +45,4 @@ Data compilation, code, figures and drafting were done with the assistance of An
 
 ## Citation
 
-Gondane, S. (2026). *Superhuman Scores, Sub-Human Adaptation* [Preprint and replication package]. Zenodo. DOI: to be added on publication.
+Gondane, S. (2026). *Superhuman Scores, Sub-Human Adaptation* [Preprint and replication package]. Zenodo. https://doi.org/10.5281/zenodo.23050144
